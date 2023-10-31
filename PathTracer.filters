@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{6059d254-3513-41e8-924c-efbe826386ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\imgui">
+      <UniqueIdentifier>{20b90ce4-7fcb-4731-b9a0-075f875de82d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\backends">
+      <UniqueIdentifier>{b392319f-f531-48b7-a9b9-87627b59acd0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\backends\imgui_impl_glfw.cpp">
+      <Filter>Source\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\backends\imgui_impl_opengl3.cpp">
+      <Filter>Source\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\imgui\imgui_demo.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\imgui\imgui_draw.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\imgui\imgui_tables.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\imgui\imgui_widgets.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\imgui\imgui.cpp">
+      <Filter>Source\imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\imgui.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\backends\imgui_impl_glfw.h">
+      <Filter>Source\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\backends\imgui_impl_opengl3.h">
+      <Filter>Source\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\backends\imgui_impl_opengl3_loader.h">
+      <Filter>Source\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\imgui\imconfig.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\imgui\imgui_internal.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.txt" />
+    <None Include="..\..\misc\debuggers\imgui.natvis">
+      <Filter>Source\imgui</Filter>
+    </None>
+    <None Include="..\..\misc\debuggers\imgui.natstepfilter">
+      <Filter>Source\imgui</Filter>
+    </None>
+  </ItemGroup>
+</Project>
