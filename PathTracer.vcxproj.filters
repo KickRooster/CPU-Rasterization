@@ -1,8 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Source\main.cpp">
-      <Filter>Source</Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{df14f208-362f-48f8-8379-a9cf5f397090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\backends">
+      <UniqueIdentifier>{dacdce61-9544-46df-b68a-1e3f909f1ead}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\imgui">
+      <UniqueIdentifier>{b10d3428-dd5c-47cc-9bc8-9641bee34c99}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\backends\imgui_impl_glfw.cpp">
+      <Filter>Source\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\backends\imgui_impl_opengl3.cpp">
+      <Filter>Source\backends</Filter>
     </ClCompile>
     <ClCompile Include="Source\imgui\imgui.cpp">
       <Filter>Source\imgui</Filter>
@@ -19,23 +33,11 @@
     <ClCompile Include="Source\imgui\imgui_widgets.cpp">
       <Filter>Source\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Source\backends\imgui_impl_glfw.cpp">
-      <Filter>Source\backends</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\backends\imgui_impl_opengl3.cpp">
-      <Filter>Source\backends</Filter>
+    <ClCompile Include="Source\main.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\imgui\imconfig.h">
-      <Filter>Source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\imgui\imgui.h">
-      <Filter>Source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\imgui\imgui_internal.h">
-      <Filter>Source\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="Source\backends\imgui_impl_glfw.h">
       <Filter>Source\backends</Filter>
     </ClInclude>
@@ -45,25 +47,14 @@
     <ClInclude Include="Source\backends\imgui_impl_opengl3_loader.h">
       <Filter>Source\backends</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\README.txt" />
-    <None Include="..\..\misc\debuggers\imgui.natstepfilter">
+    <ClInclude Include="Source\imgui\imconfig.h">
       <Filter>Source\imgui</Filter>
-    </None>
-    <None Include="..\..\misc\debuggers\imgui.natvis">
+    </ClInclude>
+    <ClInclude Include="Source\imgui\imgui.h">
       <Filter>Source\imgui</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Source">
-      <UniqueIdentifier>{09689aae-3355-42bb-b0b5-f35c62d9b008}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\imgui">
-      <UniqueIdentifier>{43ecb814-8bf1-423d-80fc-489c2533a9c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\backends">
-      <UniqueIdentifier>{48a9024d-ab56-4017-adbb-6f906169b080}</UniqueIdentifier>
-    </Filter>
+    </ClInclude>
+    <ClInclude Include="Source\imgui\imgui_internal.h">
+      <Filter>Source\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
