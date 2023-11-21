@@ -76,7 +76,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>libs\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>libs\glfw\include;Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,7 +90,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>libs\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>libs\glfw\include;Source\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,20 +131,68 @@
   <ItemGroup>
     <ClCompile Include="Source\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="Source\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Source\Components\SkeletalMeshComponent.cpp" />
+    <ClCompile Include="Source\Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Source\DesignPattern\ObserverPattern\Subject.cpp" />
     <ClCompile Include="Source\imgui\imgui.cpp" />
     <ClCompile Include="Source\imgui\imgui_demo.cpp" />
     <ClCompile Include="Source\imgui\imgui_draw.cpp" />
     <ClCompile Include="Source\imgui\imgui_tables.cpp" />
     <ClCompile Include="Source\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Math\MathBase.cpp" />
+    <ClCompile Include="Source\Math\Matrix4x4.cpp" />
+    <ClCompile Include="Source\Math\Rect.cpp" />
+    <ClCompile Include="Source\Math\Vector3.cpp" />
+    <ClCompile Include="Source\Math\Vector4.cpp" />
+    <ClCompile Include="Source\Objects\Actor.cpp" />
+    <ClCompile Include="Source\Objects\Camera.cpp" />
+    <ClCompile Include="Source\Objects\Game.cpp" />
+    <ClCompile Include="Source\Objects\World.cpp" />
+    <ClCompile Include="Source\Rasterizer\HDRColor.cpp" />
+    <ClCompile Include="Source\Rasterizer\Driver.cpp" />
+    <ClCompile Include="Source\Rasterizer\IrradianceBuffer.cpp" />
+    <ClCompile Include="Source\Rasterizer\Point2.cpp" />
+    <ClCompile Include="Source\Rasterizer\Rasterizer.cpp" />
+    <ClCompile Include="Source\Rasterizer\LDRColor.cpp" />
+    <ClCompile Include="Source\Rasterizer\Triangle.cpp" />
+    <ClCompile Include="Source\Rasterizer\Vertex.cpp" />
+    <ClCompile Include="Source\Rasterizer\PrimitiveList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\backends\imgui_impl_glfw.h" />
     <ClInclude Include="Source\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="Source\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Source\Components\SkeletalMeshComponent.h" />
+    <ClInclude Include="Source\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Source\DesignPattern\ObserverPattern\Obeserver.h" />
+    <ClInclude Include="Source\DesignPattern\ObserverPattern\Subject.h" />
+    <ClInclude Include="Source\DesignPattern\SingletonPattern\Singleton.h" />
     <ClInclude Include="Source\imgui\imconfig.h" />
     <ClInclude Include="Source\imgui\imgui.h" />
     <ClInclude Include="Source\imgui\imgui_internal.h" />
+    <ClInclude Include="Source\Include\Core.h" />
+    <ClInclude Include="Source\Math\Matrix4x4.h" />
+    <ClInclude Include="Source\Math\MathBase.h" />
+    <ClInclude Include="Source\Math\Rect.h" />
+    <ClInclude Include="Source\Math\Vector3.h" />
+    <ClInclude Include="Source\Math\Vector4.h" />
+    <ClInclude Include="Source\Objects\Actor.h" />
+    <ClInclude Include="Source\Objects\Camera.h" />
+    <ClInclude Include="Source\Objects\Game.h" />
+    <ClInclude Include="Source\Objects\World.h" />
+    <ClInclude Include="Source\Rasterizer\HDRColor.h" />
+    <ClInclude Include="Source\Rasterizer\Driver.h" />
+    <ClInclude Include="Source\Rasterizer\IrradianceBuffer.h" />
+    <ClInclude Include="Source\Rasterizer\Point2.h" />
+    <ClInclude Include="Source\Rasterizer\Rasterizer.h" />
+    <ClInclude Include="Source\Rasterizer\LDRColor.h" />
+    <ClInclude Include="Source\Rasterizer\Triangle.h" />
+    <ClInclude Include="Source\Rasterizer\Vertex.h" />
+    <ClInclude Include="Source\Rasterizer\PrimitiveList.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Components\IComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

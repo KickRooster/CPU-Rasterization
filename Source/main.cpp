@@ -17,6 +17,9 @@
 #endif
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
+#include "Objects/Game.h"
+#include "Rasterizer/LDRColor.h"
+
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -32,6 +35,76 @@
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
+GLenum GLCheckError()
+{
+    GLenum ErrorCode;
+
+    if ((ErrorCode = glGetError()) != GL_NO_ERROR)
+    {
+        switch (ErrorCode)
+        {
+        case GL_INVALID_ENUM:
+            ErrorCode = GL_INVALID_ENUM;
+            break;
+        case GL_INVALID_VALUE:
+            ErrorCode = GL_INVALID_VALUE;
+            break;
+        case GL_INVALID_OPERATION:
+            ErrorCode = GL_INVALID_OPERATION;
+            break;
+        case GL_STACK_OVERFLOW:
+            ErrorCode = GL_STACK_OVERFLOW;
+            break;
+        case GL_STACK_UNDERFLOW:
+            ErrorCode = GL_STACK_UNDERFLOW;
+            break;
+        case GL_OUT_OF_MEMORY:
+            ErrorCode = GL_OUT_OF_MEMORY;
+            break;
+        default:
+            break;
+        }
+    }
+
+    return ErrorCode;
+}
+
+GLuint CreateTexture(core::int32 Width, core::int32 Height)
+{
+    GLuint TextureID;
+    glGenTextures(1, &TextureID);
+    GLCheckError();
+    glBindTexture(GL_TEXTURE_2D, TextureID);
+    GLCheckError();
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    GLCheckError();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GLCheckError();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    GLCheckError();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    GLCheckError();
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    GLCheckError();
+
+    return TextureID;
+}
+
+void UpdateTexture(GLuint TextureID, core::int32 Width, core::int32 Height, const core::uint8 * RawData)
+{
+    glBindTexture(GL_TEXTURE_2D, TextureID);
+    GLCheckError();
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, RawData);
+    GLCheckError();
+}
+
+void DeleteTexture(GLuint TextureID)
+{
+    glDeleteTextures(1, &TextureID);
 }
 
 // Main code
@@ -108,6 +181,15 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    core::int32 ViewportWidth = 512;
+    core::int32 ViewportHeight = 512;
+
+    std::unique_ptr<core::UGame> GameInstance = std::make_unique<core::UGame>();
+    GameInstance->Initialize(ViewportWidth, ViewportHeight);
+    GLuint ImageTextureID = CreateTexture(ViewportWidth, ViewportHeight);
+
+    double PreviousFrameTimeStamp = glfwGetTime();
+
     // Main loop
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
@@ -125,10 +207,25 @@ int main(int, char**)
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
 
+        //  Run resterizer
+        double CurrentFrameTimeStamp = glfwGetTime();
+        double DeltaTime = CurrentFrameTimeStamp - PreviousFrameTimeStamp;
+        //  Seconds to milliseconds
+        GameInstance->Tick(static_cast<float>(DeltaTime * 1000));
+        PreviousFrameTimeStamp = CurrentFrameTimeStamp;
+        GameInstance->Render_Debug();
+
+        UpdateTexture(ImageTextureID, ViewportWidth, ViewportHeight, GameInstance->GetLDRData());
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        // 0.
+        ImGui::Begin("Rasterizing View");
+        ImGui::Image((void*)(intptr_t)ImageTextureID, ImVec2(static_cast<float>(ViewportWidth), static_cast<float>(ViewportHeight)));
+        ImGui::End();
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
@@ -181,6 +278,8 @@ int main(int, char**)
 #ifdef __EMSCRIPTEN__
     EMSCRIPTEN_MAINLOOP_END;
 #endif
+
+    DeleteTexture(ImageTextureID);
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
