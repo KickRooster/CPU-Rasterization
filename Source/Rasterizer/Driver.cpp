@@ -25,65 +25,64 @@ namespace core
         ViewportMat.M[3][3] = 1.0;
     }
 
-    void UDriver::TransformLocal2World(const UActor& Actor, const FMatrix4x4& Local2World) const
+    void UDriver::Transform(FPrimitiveList& PrimitiveList, const FMatrix4x4& Matrix) const
     {
-        Actor.GetStaticMeshComponent()->Transform(Local2World);
-    }
-
-    void UDriver::TransformWorld2Camera(const UActor& Actor, const FMatrix4x4& World2Camera) const
-    {
-        Actor.GetStaticMeshComponent()->Transform(World2Camera);
-    }
-
-    void UDriver::TransformCamera2CVV(const UActor& Actor, const FMatrix4x4& Projection) const
-    {
-        Actor.GetStaticMeshComponent()->Transform(Projection);
-    }
-
-    void UDriver::ProjectCVV2NDC(const UActor& Actor) const
-    {
-        Actor.GetStaticMeshComponent()->Project2NDC();
-    }
-
-    void UDriver::TransformNDC2Viewport(const UActor& Actor, const FMatrix4x4& Viewport) const
-    {
-        Actor.GetStaticMeshComponent()->Transform(Viewport);
-    }
-
-    void UDriver::Rasterize(const UActor& Actor, FIrradianceBuffer& IrradianceBuffer) const
-    {
-        Actor.GetStaticMeshComponent()->BeforeRasterizing();
+        for (SIZE_T i = 0; i < PrimitiveList.VertexList.size(); ++i)
         {
-            while (Actor.GetStaticMeshComponent()->TopTriangleIsValid())
+            FVertex TransformedVertex;
+            TransformedVertex.Position = PrimitiveList.VertexList[i].Position * Matrix;
+
+            PrimitiveList.VertexList[i].Position = TransformedVertex.Position;
+        }
+    }
+
+    void UDriver::Project2NDC(FPrimitiveList& PrimitiveList) const
+    {
+        for (SIZE_T i = 0; i < PrimitiveList.VertexList.size(); ++i)
+        {
+            PrimitiveList.VertexList[i].Position.X /= PrimitiveList.VertexList[i].Position.W;
+            PrimitiveList.VertexList[i].Position.Y /= PrimitiveList.VertexList[i].Position.W;
+            PrimitiveList.VertexList[i].Position.Z /= PrimitiveList.VertexList[i].Position.W;
+            PrimitiveList.VertexList[i].Position.W /= PrimitiveList.VertexList[i].Position.W;
+        }
+    }
+
+    void UDriver::TransformLocal2World(FPrimitiveList& PrimitiveList, const FMatrix4x4& Local2World) const
+    {
+        Transform(PrimitiveList, Local2World);
+    }
+
+    void UDriver::TransformWorld2Camera(FPrimitiveList& PrimitiveList, const FMatrix4x4& World2Camera) const
+    {
+       Transform(PrimitiveList, World2Camera);
+    }
+
+    void UDriver::TransformCamera2CVV(FPrimitiveList& PrimitiveList, const FMatrix4x4& Projection) const
+    {
+        Transform(PrimitiveList, Projection);
+    }
+
+    void UDriver::ProjectCVV2NDC(FPrimitiveList& PrimitiveList) const
+    {
+        Project2NDC(PrimitiveList);
+    }
+
+    void UDriver::TransformNDC2Viewport(FPrimitiveList& PrimitiveList, const FMatrix4x4& Viewport) const
+    {
+        Transform(PrimitiveList, Viewport);
+    }
+
+    void UDriver::Rasterize(FPrimitiveList& PrimitiveList, FIrradianceBuffer& IrradianceBuffer) const
+    {
+        PrimitiveList.BeforeRasterizing();
+        {
+            while (PrimitiveList.TopIsValid())
             {
-                FTriangle Triangle = Actor.GetStaticMeshComponent()->PopTriangle();
+                FTriangle Triangle = PrimitiveList.PopTriangle();
                 URasterizer::Instance()->RasterizeTriangle(Triangle, IrradianceBuffer);
             }
         }
-        Actor.GetStaticMeshComponent()->PostRasterizing();
-    }
-
-    void UDriver::Rasterize_Debug(const UActor& Actor, FIrradianceBuffer& IrradianceBuffer) const
-    {
-        Actor.GetStaticMeshComponent()->BeforeRasterizing();
-        {
-            while (Actor.GetStaticMeshComponent()->TopTriangleIsValid())
-            {
-                FTriangle Triangle = Actor.GetStaticMeshComponent()->PopTriangle();
-
-                Triangle.V0.Position.X = 100;
-                Triangle.V0.Position.Y = 100;
-
-                Triangle.V1.Position.X = 200;
-                Triangle.V1.Position.Y = 400;
-
-                Triangle.V2.Position.X = 400;
-                Triangle.V2.Position.Y = 200;
-
-                URasterizer::Instance()->RasterizeTriangle(Triangle, IrradianceBuffer);
-            }
-        }
-        Actor.GetStaticMeshComponent()->PostRasterizing();
+        PrimitiveList.PostRasterizing();
     }
 
     void UDriver::SetViewport(int32 X, int32 Y, int32 Width, int32 Height)
@@ -96,25 +95,18 @@ namespace core
         UpdateViewportMatrix();
     }
 
-    void UDriver::DrawActor(const UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer)
+    void UDriver::DrawActor(UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer)
     {
         if (Actor.GetStaticMeshComponent())
         {
-            TransformLocal2World(Actor, Actor.GetLocal2WorldMatrix());
-            TransformWorld2Camera(Actor, Camera.GetWorld2LocalMatrix());
-            TransformCamera2CVV(Actor, Camera.GetPerspectiveProjectionMatrix());
+            FPrimitiveList TransformedPrimitiveList = Actor.GetStaticMeshComponent()->GetPrimitiveList();
+            TransformLocal2World(TransformedPrimitiveList, Actor.GetLocal2WorldMatrix());
+            TransformWorld2Camera(TransformedPrimitiveList, Camera.GetWorld2LocalMatrix());
+            TransformCamera2CVV(TransformedPrimitiveList, Camera.GetPerspectiveProjectionMatrix());
             //  TODO:   Clip.
-            ProjectCVV2NDC(Actor);
-            TransformNDC2Viewport(Actor, ViewportMat);
-            Rasterize(Actor, IrradianceBuffer);
-        }
-    }
-
-    void UDriver::Debug(const UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer)
-    {
-        if (Actor.GetStaticMeshComponent())
-        {
-            Rasterize_Debug(Actor, IrradianceBuffer);
+            ProjectCVV2NDC(TransformedPrimitiveList);
+            TransformNDC2Viewport(TransformedPrimitiveList, ViewportMat);
+            Rasterize(TransformedPrimitiveList, IrradianceBuffer);
         }
     }
 }

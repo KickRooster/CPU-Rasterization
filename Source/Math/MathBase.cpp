@@ -6,4 +6,14 @@ namespace core
     {
         return abs(Lhs - Rhs) < FLOAT_ERROR;
     }
+
+    float Degree2Radian(float Degree)
+    {
+        return Degree * DEGREE_TO_RADIAN;
+    }
+
+    float Radian2Degree(float Radian)
+    {
+        return Radian * RADIAN_TO_DEGREE;
+    }
 }

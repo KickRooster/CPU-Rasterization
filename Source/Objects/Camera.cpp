@@ -6,7 +6,6 @@ namespace core
     PerspectiveProjectionMatrix(1.f),
     OrthogonalProjectionMatrix(1.f)
     {
-
     }
 
     void UCamera::Tick(float DeltaTime)

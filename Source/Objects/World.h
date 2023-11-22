@@ -17,6 +17,5 @@ namespace core
         void AddBasicActor(std::unique_ptr<UActor> BasicActor);
         void Tick(float DeltaTime);
         void Render(FIrradianceBuffer& IrradianceBuffer);
-        void Render_Debug(FIrradianceBuffer& IrradianceBuffer);
     };
 }

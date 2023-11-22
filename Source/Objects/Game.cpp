@@ -13,9 +13,10 @@ namespace core
     {
         CurrentWorld = std::make_unique<UWorld>();
 
-        FVertex Vertex0(-10.0, -10.0, 10.0, 1.0);
-        FVertex Vertex1(0, 10.0, 10.0, 0);
-        FVertex Vertex2(10.0, -10.0, 10.0, 1.0);
+        //  Clockwise.
+        FVertex Vertex0(-10.0, -10.0, 50.0, 1.0);
+        FVertex Vertex1(0, 10.0, 50.0, 1.0);
+        FVertex Vertex2(10.0, -10.0, 50.0, 1.0);
         std::unique_ptr<UStaticMeshComponent> StaticMeshComponent = std::make_unique<UStaticMeshComponent>();
         StaticMeshComponent->AddVertex(Vertex0);
         StaticMeshComponent->AddVertex(Vertex1);
@@ -29,6 +30,11 @@ namespace core
         CurrentWorld->AddBasicActor(std::move(TriangleActor));
 
         std::unique_ptr<UCamera> CameraActor = std::make_unique<UCamera>();
+        CameraActor->Aspect = static_cast<float>(ViewportWidth) / static_cast<float>(ViewportHeight);
+        CameraActor->ZNear = 0.1f;
+        CameraActor->ZFar = 1000.0f;
+        CameraActor->FieldOfViewY = Degree2Radian(120.0f);
+        CameraActor->Position = FVector3(0, 0, 0);
         CurrentWorld->AddCameraActor(std::move(CameraActor));
 
         UDriver::Instance()->SetViewport(0, 0, ViewportWidth, ViewportHeight);
@@ -44,13 +50,6 @@ namespace core
     {
         IrradianceBuffer->Clear(FHDRColor(0, 0.2f, 0.4f, 1.0f));
         CurrentWorld->Render(*IrradianceBuffer);
-        IrradianceBuffer->ToneMaping();
-    }
-
-    void UGame::Render_Debug()
-    {
-        IrradianceBuffer->Clear(FHDRColor(0, 0.2f, 0.4f, 1.0f));
-        CurrentWorld->Render_Debug(*IrradianceBuffer);
         IrradianceBuffer->ToneMaping();
     }
 

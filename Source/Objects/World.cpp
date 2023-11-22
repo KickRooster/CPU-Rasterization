@@ -31,12 +31,4 @@ namespace core
             UDriver::Instance()->DrawActor(*BasicActorList[i], *DefaultCamera, IrradianceBuffer);
         }
     }
-
-    void UWorld::Render_Debug(FIrradianceBuffer& IrradianceBuffer)
-    {
-        for (SIZE_T i = 0; i < BasicActorList.size(); ++i)
-        {
-            UDriver::Instance()->Debug(*BasicActorList[i], *DefaultCamera, IrradianceBuffer);
-        }
-    }
 }

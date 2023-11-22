@@ -14,7 +14,6 @@ namespace core
         void Initialize(int32 ViewportWidth, int32 ViewportHeight);
         void Tick(float DeltaTime);
         void Render();
-        void Render_Debug();
         uint8 * GetLDRData() const;
         void ShutDown();
     };

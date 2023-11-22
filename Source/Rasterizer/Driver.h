@@ -34,17 +34,17 @@ namespace core
 
         void UpdateViewportMatrix();
 
-        void TransformLocal2World(const UActor& Actor, const FMatrix4x4& Local2World) const;
-        void TransformWorld2Camera(const UActor& Actor, const FMatrix4x4& World2Camera) const;
-        void TransformCamera2CVV(const UActor& Actor, const FMatrix4x4& Projection) const;
-        void ProjectCVV2NDC(const UActor& Actor) const;
-        void TransformNDC2Viewport(const UActor& Actor, const FMatrix4x4& Viewport) const;
-        void Rasterize(const UActor& Actor, FIrradianceBuffer& IrradianceBuffer) const;
-        void Rasterize_Debug(const UActor& Actor, FIrradianceBuffer& IrradianceBuffer) const;
+        void Transform(FPrimitiveList& PrimitiveList, const FMatrix4x4& Matrix) const;
+        void Project2NDC(FPrimitiveList& PrimitiveList) const;
+        void TransformLocal2World(FPrimitiveList& PrimitiveList, const FMatrix4x4& Local2World) const;
+        void TransformWorld2Camera(FPrimitiveList& PrimitiveList, const FMatrix4x4& World2Camera) const;
+        void TransformCamera2CVV(FPrimitiveList& PrimitiveList, const FMatrix4x4& Projection) const;
+        void ProjectCVV2NDC(FPrimitiveList& PrimitiveList) const;
+        void TransformNDC2Viewport(FPrimitiveList& PrimitiveList, const FMatrix4x4& Viewport) const;
+        void Rasterize(FPrimitiveList& PrimitiveList, FIrradianceBuffer& IrradianceBuffer) const;
 
     public:
         void SetViewport(int32 X, int32 Y, int32 Width, int32 Height);
-        void DrawActor(const UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer);
-        void Debug(const UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer);
+        void DrawActor(UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer);
     };
 }

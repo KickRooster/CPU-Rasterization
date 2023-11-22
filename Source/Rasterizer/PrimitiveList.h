@@ -16,6 +16,7 @@ namespace core
         std::vector<int32> IndexList;
 
         FPrimitiveList();
+        FPrimitiveList& operator =(const FPrimitiveList & PrimitiveList);
 
         void AddVertex(FVertex Vertex);
         void AddIndex(int32 Index);

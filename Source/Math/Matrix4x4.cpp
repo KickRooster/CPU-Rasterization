@@ -260,7 +260,7 @@ namespace core
             );
 
         FMatrix4x4 Adjoint = FMatrix4x4(
-            C00, C11, C20, C30,
+            C00, C10, C20, C30,
             C01, C11, C21, C31,
             C02, C12, C22, C32,
             C03, C13, C23, C33);

@@ -8,6 +8,47 @@ namespace core
 
     }
 
+    FPrimitiveList& FPrimitiveList::operator=(const FPrimitiveList& PrimitiveList)
+    {
+        IndexCursor = PrimitiveList.IndexCursor;
+
+        if (VertexList.size() != PrimitiveList.VertexList.size())
+        {
+            VertexList.clear();
+
+            for (SIZE_T i = 0; i < PrimitiveList.VertexList.size(); ++i)
+            {
+                VertexList.push_back(PrimitiveList.VertexList[i]);
+            }
+        }
+        else
+        {
+            for (SIZE_T i = 0; i < PrimitiveList.VertexList.size(); ++i)
+            {
+                VertexList[i] = PrimitiveList.VertexList[i];
+            }
+        }
+
+        if (IndexList.size() != PrimitiveList.IndexList.size())
+        {
+            IndexList.clear();
+
+            for (SIZE_T i = 0; i < PrimitiveList.IndexList.size(); ++i)
+            {
+                IndexList.push_back(PrimitiveList.IndexList[i]);
+            }
+        }
+        else
+        {
+            for (SIZE_T i = 0; i < PrimitiveList.IndexList.size(); ++i)
+            {
+                IndexList[i] = PrimitiveList.IndexList[i];
+            }
+        }
+
+        return *this;
+    }
+
     void FPrimitiveList::AddVertex(FVertex Vertex)
     {
         VertexList.push_back(Vertex);

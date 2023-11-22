@@ -19,12 +19,7 @@ namespace core
         void OnUnregister() override;
         void AddVertex(FVertex Vertex);
         void AddIndex(int32 Index);
-        void Transform(const FMatrix4x4& Matrix);
-        void Project2NDC();
-        void BeforeRasterizing() const ;
-        bool TopTriangleIsValid() const ;
-        FTriangle PopTriangle()  const ;
-        void PostRasterizing() const;
+        const FPrimitiveList& GetPrimitiveList() const;
         virtual ~UStaticMeshComponent();
     };
 }

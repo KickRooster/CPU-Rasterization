@@ -4,7 +4,10 @@
 
 namespace core
 {
-    //  Colum major matrix
+    //  Row major matrix, store in memory layout.
+    //  [0][0]  [0][1]  [0][2]  [0][3]  [1][0]  [1][1]  [1][2]  [1][3]  [2][0]  [2][1]  [2][2]  [2][3]  [3][0]  [3][1]  [3][2]  [3][3]
+    //  Basic vectors store as "column major".
+    //  Vector4 stores as column vector, FMatrix4x4 post-multiply Vector4.
     //  1   0   0   0
     //  0   1   0   0
     //  0   0   1   0

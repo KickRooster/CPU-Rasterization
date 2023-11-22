@@ -213,7 +213,7 @@ int main(int, char**)
         //  Seconds to milliseconds
         GameInstance->Tick(static_cast<float>(DeltaTime * 1000));
         PreviousFrameTimeStamp = CurrentFrameTimeStamp;
-        GameInstance->Render_Debug();
+        GameInstance->Render();
 
         UpdateTexture(ImageTextureID, ViewportWidth, ViewportHeight, GameInstance->GetLDRData());
 
