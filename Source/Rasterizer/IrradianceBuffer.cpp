@@ -37,10 +37,7 @@ namespace core
 
     void FIrradianceBuffer::FillUpHorizontal(int32 Y, int32 StartX, int32 EndX, const FHDRColor& Color)
     {
-        if (StartX > EndX)
-        {
-            std::swap(StartX, EndX);
-        }
+        StartX = std::max(0, StartX);
         EndX = std::min(EndX, Width - 1);
 
         for (int32 i = StartX; i <= EndX; ++i)

@@ -14,9 +14,9 @@ namespace core
         CurrentWorld = std::make_unique<UWorld>();
 
         //  Clockwise.
-        FVertex Vertex0(-10.0, -10.0, 50.0, 1.0);
-        FVertex Vertex1(0, 10.0, 50.0, 1.0);
-        FVertex Vertex2(10.0, -10.0, 50.0, 1.0);
+        FVertex Vertex0(-30.0, -30.0, 50.0, 1.0);
+        FVertex Vertex1(0, 30.0, 50.0, 1.0);
+        FVertex Vertex2(30.0, -30.0, 50.0, 1.0);
         std::unique_ptr<UStaticMeshComponent> StaticMeshComponent = std::make_unique<UStaticMeshComponent>();
         StaticMeshComponent->AddVertex(Vertex0);
         StaticMeshComponent->AddVertex(Vertex1);

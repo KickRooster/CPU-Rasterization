@@ -18,6 +18,12 @@ namespace core
     {
         DefaultCamera->Tick(DeltaTime);
 
+        //  Code for testing.
+        for (SIZE_T i = 0; i < BasicActorList.size(); ++i)
+        {
+            BasicActorList[i]->RotateAroundZ(DeltaTime);
+        }
+
         for (SIZE_T i = 0; i < BasicActorList.size(); ++i)
         {
             BasicActorList[i]->Tick(DeltaTime);

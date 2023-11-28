@@ -24,6 +24,8 @@ namespace core
         const FMatrix4x4& GetLocal2WorldMatrix() const;
         const FMatrix4x4& GetWorld2LocalMatrix() const ;
         virtual void Tick(float DeltaTime);
+        //  Code for testing.
+        virtual void RotateAroundZ(float DeltaTime);
         virtual ~UActor(){}
     };
 }

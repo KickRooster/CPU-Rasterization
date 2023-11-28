@@ -36,11 +36,6 @@ namespace core
 
         void Transform(FPrimitiveList& PrimitiveList, const FMatrix4x4& Matrix) const;
         void Project2NDC(FPrimitiveList& PrimitiveList) const;
-        void TransformLocal2World(FPrimitiveList& PrimitiveList, const FMatrix4x4& Local2World) const;
-        void TransformWorld2Camera(FPrimitiveList& PrimitiveList, const FMatrix4x4& World2Camera) const;
-        void TransformCamera2CVV(FPrimitiveList& PrimitiveList, const FMatrix4x4& Projection) const;
-        void ProjectCVV2NDC(FPrimitiveList& PrimitiveList) const;
-        void TransformNDC2Viewport(FPrimitiveList& PrimitiveList, const FMatrix4x4& Viewport) const;
         void Rasterize(FPrimitiveList& PrimitiveList, FIrradianceBuffer& IrradianceBuffer) const;
 
     public:

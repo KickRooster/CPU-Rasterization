@@ -190,6 +190,8 @@ int main(int, char**)
 
     double PreviousFrameTimeStamp = glfwGetTime();
 
+    bool RunTick = true ;
+
     // Main loop
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
@@ -210,8 +212,11 @@ int main(int, char**)
         //  Run resterizer
         double CurrentFrameTimeStamp = glfwGetTime();
         double DeltaTime = CurrentFrameTimeStamp - PreviousFrameTimeStamp;
-        //  Seconds to milliseconds
-        GameInstance->Tick(static_cast<float>(DeltaTime * 1000));
+        if (RunTick)
+        {
+            //  Seconds to milliseconds
+            GameInstance->Tick(static_cast<float>(DeltaTime * 1000));
+        }
         PreviousFrameTimeStamp = CurrentFrameTimeStamp;
         GameInstance->Render();
 
@@ -249,6 +254,11 @@ int main(int, char**)
                 counter++;
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
+
+            if (ImGui::Button("Run Tick"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            {
+                RunTick = !RunTick;
+            }
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();

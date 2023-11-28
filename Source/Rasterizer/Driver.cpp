@@ -47,31 +47,6 @@ namespace core
         }
     }
 
-    void UDriver::TransformLocal2World(FPrimitiveList& PrimitiveList, const FMatrix4x4& Local2World) const
-    {
-        Transform(PrimitiveList, Local2World);
-    }
-
-    void UDriver::TransformWorld2Camera(FPrimitiveList& PrimitiveList, const FMatrix4x4& World2Camera) const
-    {
-       Transform(PrimitiveList, World2Camera);
-    }
-
-    void UDriver::TransformCamera2CVV(FPrimitiveList& PrimitiveList, const FMatrix4x4& Projection) const
-    {
-        Transform(PrimitiveList, Projection);
-    }
-
-    void UDriver::ProjectCVV2NDC(FPrimitiveList& PrimitiveList) const
-    {
-        Project2NDC(PrimitiveList);
-    }
-
-    void UDriver::TransformNDC2Viewport(FPrimitiveList& PrimitiveList, const FMatrix4x4& Viewport) const
-    {
-        Transform(PrimitiveList, Viewport);
-    }
-
     void UDriver::Rasterize(FPrimitiveList& PrimitiveList, FIrradianceBuffer& IrradianceBuffer) const
     {
         PrimitiveList.BeforeRasterizing();
@@ -100,12 +75,17 @@ namespace core
         if (Actor.GetStaticMeshComponent())
         {
             FPrimitiveList TransformedPrimitiveList = Actor.GetStaticMeshComponent()->GetPrimitiveList();
-            TransformLocal2World(TransformedPrimitiveList, Actor.GetLocal2WorldMatrix());
-            TransformWorld2Camera(TransformedPrimitiveList, Camera.GetWorld2LocalMatrix());
-            TransformCamera2CVV(TransformedPrimitiveList, Camera.GetPerspectiveProjectionMatrix());
+            //  Transform local to world.
+            Transform(TransformedPrimitiveList, Actor.GetLocal2WorldMatrix());
+            //  Transform world to camera.
+            Transform(TransformedPrimitiveList, Camera.GetWorld2LocalMatrix());
+            //  Transform camera to CVV.
+            Transform(TransformedPrimitiveList, Camera.GetPerspectiveProjectionMatrix());
             //  TODO:   Clip.
-            ProjectCVV2NDC(TransformedPrimitiveList);
-            TransformNDC2Viewport(TransformedPrimitiveList, ViewportMat);
+            //  Project CVV to NDC.
+            Project2NDC(TransformedPrimitiveList);
+            //  Transform NDC to viewport.
+            Transform(TransformedPrimitiveList, ViewportMat);
             Rasterize(TransformedPrimitiveList, IrradianceBuffer);
         }
     }

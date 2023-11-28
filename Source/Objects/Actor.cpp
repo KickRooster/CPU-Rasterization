@@ -39,10 +39,16 @@ namespace core
 
     void UActor::Tick(float DeltaTime)
     {
-        Local2WorldMatrix.SetTranslation(Position);
-        Local2WorldMatrix.SetRotation(Rotation);
-        Local2WorldMatrix.SetScale(Scale);
+        //Local2WorldMatrix.SetTranslation(Position);
+        //Local2WorldMatrix.SetRotation(Rotation);
+        //Local2WorldMatrix.SetScale(Scale);
 
         World2LocalMatrix = Local2WorldMatrix.GetInverse();
+    }
+
+    void UActor::RotateAroundZ(float DeltaTime)
+    {
+        FMatrix4x4 RotationMatrix = FMatrix4x4::GetRotationAroundZ(Degree2Radian(0.04f) * DeltaTime);
+        Local2WorldMatrix *= RotationMatrix;
     }
 }

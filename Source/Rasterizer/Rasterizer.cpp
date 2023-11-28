@@ -33,19 +33,44 @@ namespace core
         float CurrentX1 = V0.Position.X;
         float CurrentX2 = V0.Position.X;
 
-        int32 V0Y = static_cast<int32>(floor(V0.Position.Y));
-        int32 V1V2Y = static_cast<int32>(ceil(V1.Position.Y));
+        int32 V0Y = static_cast<int32>(round(V0.Position.Y));
+        int32 V1V2Y = static_cast<int32>(round(V1.Position.Y));
 
-        for (int32 ScanLineY = V0Y; ScanLineY <= V1V2Y; ++ScanLineY)
+        int32 ScanLineY = V0Y;
+        do
         {
-            int32 StartX = static_cast<int32>(floor(CurrentX1));
-            int32 EndX = static_cast<int32>(ceil(CurrentX2));
+            int32 StartX = static_cast<int32>(round(CurrentX1));
+            int32 EndX = static_cast<int32>(round(CurrentX2));
+
+            if (StartX > EndX)
+            {
+                std::swap(StartX, EndX);
+            }
 
             //  XXX:    Hard code 0, 1, 0, 1.
             IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 1, 0, 1));
             CurrentX1 += InvSlope1;
             CurrentX2 += InvSlope2;
+
+            ++ScanLineY;
         }
+        while(ScanLineY < V1V2Y);
+
+        // for (int32 ScanLineY = V0Y; ScanLineY < V1V2Y; ++ScanLineY)
+        // {
+        //     int32 StartX = static_cast<int32>(round(CurrentX1));
+        //     int32 EndX = static_cast<int32>(round(CurrentX2));
+        //
+        //     if (StartX > EndX)
+        //     {
+        //         std::swap(StartX, EndX);
+        //     }
+        //
+        //     //  XXX:    Hard code 0, 1, 0, 1.
+        //     IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 1, 0, 1));
+        //     CurrentX1 += InvSlope1;
+        //     CurrentX2 += InvSlope2;
+        // }
     }
 
     void URasterizer::FillUpTopFlatTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
@@ -56,19 +81,44 @@ namespace core
         float CurrentX1 = V2.Position.X;
         float CurrentX2 = V2.Position.X;
 
-        int32 V2Y = static_cast<int32>(ceil(V2.Position.Y));
-        int32 V0V1Y = static_cast<int32>(floor(V0.Position.Y));
+        int32 V2Y = static_cast<int32>(round(V2.Position.Y));
+        int32 V0V1Y = static_cast<int32>(round(V0.Position.Y));
 
-        for (int32 ScanLineY = V2Y; ScanLineY >= V0V1Y; --ScanLineY)
+        int32 ScanLineY = V2Y;
+        do
         {
-            int32 StartX = static_cast<int32>(floor(CurrentX1));
-            int32 EndX = static_cast<int32>(ceil(CurrentX2));
+            int32 StartX = static_cast<int32>(round(CurrentX1));
+            int32 EndX = static_cast<int32>(round(CurrentX2));
+
+            if (StartX > EndX)
+            {
+                std::swap(StartX, EndX);
+            }
 
             //  XXX:    Hard code 0, 0, 1, 1
             IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 0, 1, 1));
             CurrentX1 -= InvSlope1;
             CurrentX2 -= InvSlope2;
+
+            --ScanLineY;
         }
+        while (ScanLineY > V0V1Y);
+
+        // for (int32 ScanLineY = V2Y; ScanLineY > V0V1Y; --ScanLineY)
+        // {
+        //     int32 StartX = static_cast<int32>(round(CurrentX1));
+        //     int32 EndX = static_cast<int32>(round(CurrentX2));
+        //
+        //     if (StartX > EndX)
+        //     {
+        //         std::swap(StartX, EndX);
+        //     }
+        //
+        //     //  XXX:    Hard code 0, 0, 1, 1
+        //     IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 0, 1, 1));
+        //     CurrentX1 -= InvSlope1;
+        //     CurrentX2 -= InvSlope2;
+        // }
     }
 
     void URasterizer::DoStandard(const FTriangle& Triangle, FIrradianceBuffer& IrradianceBuffer) const
