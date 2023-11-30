@@ -55,22 +55,6 @@ namespace core
             ++ScanLineY;
         }
         while(ScanLineY < V1V2Y);
-
-        // for (int32 ScanLineY = V0Y; ScanLineY < V1V2Y; ++ScanLineY)
-        // {
-        //     int32 StartX = static_cast<int32>(round(CurrentX1));
-        //     int32 EndX = static_cast<int32>(round(CurrentX2));
-        //
-        //     if (StartX > EndX)
-        //     {
-        //         std::swap(StartX, EndX);
-        //     }
-        //
-        //     //  XXX:    Hard code 0, 1, 0, 1.
-        //     IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 1, 0, 1));
-        //     CurrentX1 += InvSlope1;
-        //     CurrentX2 += InvSlope2;
-        // }
     }
 
     void URasterizer::FillUpTopFlatTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
@@ -95,30 +79,14 @@ namespace core
                 std::swap(StartX, EndX);
             }
 
-            //  XXX:    Hard code 0, 0, 1, 1
-            IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 0, 1, 1));
+            //  XXX:    Hard code 0, 1, 0, 1
+            IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 1, 0, 1));
             CurrentX1 -= InvSlope1;
             CurrentX2 -= InvSlope2;
 
             --ScanLineY;
         }
         while (ScanLineY > V0V1Y);
-
-        // for (int32 ScanLineY = V2Y; ScanLineY > V0V1Y; --ScanLineY)
-        // {
-        //     int32 StartX = static_cast<int32>(round(CurrentX1));
-        //     int32 EndX = static_cast<int32>(round(CurrentX2));
-        //
-        //     if (StartX > EndX)
-        //     {
-        //         std::swap(StartX, EndX);
-        //     }
-        //
-        //     //  XXX:    Hard code 0, 0, 1, 1
-        //     IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 0, 1, 1));
-        //     CurrentX1 -= InvSlope1;
-        //     CurrentX2 -= InvSlope2;
-        // }
     }
 
     void URasterizer::DoStandard(const FTriangle& Triangle, FIrradianceBuffer& IrradianceBuffer) const
@@ -144,6 +112,14 @@ namespace core
                 SortedTriangle.V1.Position.Z,   //  TODO:   Process 2d point, discard z component.
                 1.0f);
             FillUpBottomFlatTriangle(SortedTriangle.V0, SortedTriangle.V1, V3, IrradianceBuffer);
+            //  Patch a line between two triangles.
+            int32 StartX = static_cast<int32>(round(SortedTriangle.V1.Position.X));
+            int32 EndX = static_cast<int32>(round(V3.Position.X));
+            if (EndX < StartX)
+            {
+                std::swap(StartX, EndX);
+            }
+            IrradianceBuffer.FillUpHorizontal(static_cast<int32>(round(V3.Position.Y)), StartX, EndX, FHDRColor(0, 1, 0, 1));
             FillUpTopFlatTriangle(SortedTriangle.V1, V3, SortedTriangle.V2, IrradianceBuffer);
         }
     }

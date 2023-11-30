@@ -14,8 +14,9 @@ namespace core
         BasicActorList.push_back(std::move(BasicActor));
     }
 
-    void UWorld::Tick(float DeltaTime)
+    void UWorld::Tick(const FJoystick& Joystick, float DeltaTime)
     {
+        DefaultCamera->RespondToInput(Joystick, DeltaTime);
         DefaultCamera->Tick(DeltaTime);
 
         //  Code for testing.

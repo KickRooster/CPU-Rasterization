@@ -12,7 +12,8 @@ namespace core
     private:
         FHDRColor * * HDRData;
         FLDRColor * * LDRData;
-        uint8 * LDRRawData;
+        //  Store flipped data for OpenGL rendering.
+        uint8 * FlippedLDRRawData;
         int32 Width;
         int32 Height;
 

@@ -2,6 +2,7 @@
 #include <Core.h>
 #include "World.h"
 #include "../Rasterizer/IrradianceBuffer.h"
+#include "../Others/Joystick.h"
 
 namespace core
 {
@@ -12,7 +13,7 @@ namespace core
 
     public:
         void Initialize(int32 ViewportWidth, int32 ViewportHeight);
-        void Tick(float DeltaTime);
+        void Tick(const FJoystick& Joystick, float DeltaTime);
         void Render();
         uint8 * GetLDRData() const;
         void ShutDown();

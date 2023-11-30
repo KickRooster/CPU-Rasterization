@@ -21,7 +21,7 @@ namespace core
             LDRData[i] = new FLDRColor[Width]();
         }
 
-        LDRRawData = new uint8[Width * Height * sizeof(FLDRColor)];
+        FlippedLDRRawData = new uint8[Width * Height * sizeof(FLDRColor)];
     }
 
     void FIrradianceBuffer::Clear(const FHDRColor& Color)
@@ -37,6 +37,11 @@ namespace core
 
     void FIrradianceBuffer::FillUpHorizontal(int32 Y, int32 StartX, int32 EndX, const FHDRColor& Color)
     {
+        if (Y < 0 || Y >= Height)
+        {
+            return;
+        }
+
         StartX = std::max(0, StartX);
         EndX = std::min(EndX, Width - 1);
 
@@ -57,17 +62,17 @@ namespace core
                 LDRData[i][j].B = static_cast<uint8>(HDRData[i][j].B * 255.0f);
                 LDRData[i][j].A = static_cast<uint8>(HDRData[i][j].A * 255.0f);
 
-                LDRRawData[(i * Width + j) * sizeof(FLDRColor) + 0] = LDRData[i][j].R;
-                LDRRawData[(i * Width + j) * sizeof(FLDRColor) + 1] = LDRData[i][j].G;
-                LDRRawData[(i * Width + j) * sizeof(FLDRColor) + 2] = LDRData[i][j].B;
-                LDRRawData[(i * Width + j) * sizeof(FLDRColor) + 3] = LDRData[i][j].A;
+                FlippedLDRRawData[((Height - i - 1) * Width + j) * sizeof(FLDRColor) + 0] = LDRData[i][j].R;
+                FlippedLDRRawData[((Height - i - 1) * Width + j) * sizeof(FLDRColor) + 1] = LDRData[i][j].G;
+                FlippedLDRRawData[((Height - i - 1) * Width + j) * sizeof(FLDRColor) + 2] = LDRData[i][j].B;
+                FlippedLDRRawData[((Height - i - 1) * Width + j) * sizeof(FLDRColor) + 3] = LDRData[i][j].A;
             }
         }
     }
 
     uint8 * FIrradianceBuffer::GetRawLDRData() const
     {
-        return LDRRawData;
+        return FlippedLDRRawData;
     }
 
     FIrradianceBuffer::~FIrradianceBuffer()
@@ -80,6 +85,6 @@ namespace core
 
         delete[] HDRData;
         delete[] LDRData;
-        delete[] LDRRawData;
+        delete[] FlippedLDRRawData;
     }
 }

@@ -48,7 +48,11 @@ namespace core
 
     void UActor::RotateAroundZ(float DeltaTime)
     {
-        FMatrix4x4 RotationMatrix = FMatrix4x4::GetRotationAroundZ(Degree2Radian(0.04f) * DeltaTime);
-        Local2WorldMatrix *= RotationMatrix;
+        //FMatrix4x4 RotationMatrix = FMatrix4x4::GetRotationAroundY(Degree2Radian(0.04f) * DeltaTime);
+        //Local2WorldMatrix *= RotationMatrix;
+
+        FMatrix4x4 RotationMatrix(1.0f);
+        RotationMatrix.RotateAround(FVector3::Forward, Degree2Radian(0.04f) * DeltaTime);
+        //Local2WorldMatrix *= RotationMatrix;
     }
 }

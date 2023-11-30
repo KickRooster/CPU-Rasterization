@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include <vector>
 #include "../Rasterizer/IrradianceBuffer.h"
+#include "../Others/Joystick.h"
 
 namespace core
 {
@@ -15,7 +16,7 @@ namespace core
     public:
         void AddCameraActor(std::unique_ptr<UCamera> CameraActor);
         void AddBasicActor(std::unique_ptr<UActor> BasicActor);
-        void Tick(float DeltaTime);
+        void Tick(const FJoystick& Joystick, float DeltaTime);
         void Render(FIrradianceBuffer& IrradianceBuffer);
     };
 }

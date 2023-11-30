@@ -71,6 +71,29 @@ namespace core
         M[3][3] = M33;
     }
 
+    FMatrix4x4::FMatrix4x4(const FMatrix4x4& Matrix)
+    {
+        M[0][0] = Matrix.M[0][0];
+        M[0][1] = Matrix.M[0][1];
+        M[0][2] = Matrix.M[0][2];
+        M[0][3] = Matrix.M[0][3];
+
+        M[1][0] = Matrix.M[1][0];
+        M[1][1] = Matrix.M[1][1];
+        M[1][2] = Matrix.M[1][2];
+        M[1][3] = Matrix.M[1][3];
+
+        M[2][0] = Matrix.M[2][0];
+        M[2][1] = Matrix.M[2][1];
+        M[2][2] = Matrix.M[2][2];
+        M[2][3] = Matrix.M[2][3];
+
+        M[3][0] = Matrix.M[3][0];
+        M[3][1] = Matrix.M[3][1];
+        M[3][2] = Matrix.M[3][2];
+        M[3][3] = Matrix.M[3][3];
+    }
+
     float FMatrix4x4::GetDeterminant() const
     {
         //  00  01  02  03  00  01  02  03
@@ -342,6 +365,49 @@ namespace core
         return Mat;
     }
 
+    void FMatrix4x4::RotateAround(const FVector3& Axis, float Radian)
+    {
+        float SinTheta = sin(Radian);
+        float CosTheta = cos(Radian);
+
+        M[0][0] = CosTheta + (1 - CosTheta) * Axis.X * Axis.X;
+        M[1][0] = (1 - CosTheta) * Axis.X * Axis.Y + SinTheta * Axis.Z;
+        M[2][0] = (1 - CosTheta) * Axis.X * Axis.Z - SinTheta * Axis.Y;
+
+        M[0][1] = (1 - CosTheta) * Axis.X * Axis.Y - SinTheta * Axis.Z;
+        M[1][1] = CosTheta + (1 - CosTheta) * Axis.Y * Axis.Y;
+        M[2][1] = (1 - CosTheta) * Axis.Y * Axis.Z + SinTheta * Axis.X;
+
+        M[0][2] = (1 - CosTheta) * Axis.X * Axis.Z + SinTheta * Axis.Y;
+        M[1][2] = (1- CosTheta) * Axis.Y * Axis.Z - SinTheta * Axis.X;
+        M[2][2] = CosTheta + (1 - CosTheta) * Axis.Z * Axis.Z;
+    }
+
+    FMatrix4x4 FMatrix4x4::RotateAround(const FMatrix4x4& Matrix, const FVector3& Axis, float Radian)
+    {
+        FMatrix4x4 Rotation(1.0f);
+        Rotation.RotateAround(Axis, Radian);
+
+        FMatrix4x4 Result = Rotation * Matrix;
+
+        return Result;
+    }
+
+    FVector3 FMatrix4x4::GetXAxis() const
+    {
+        return FVector3(M[0][0], M[1][0], M[2][0]);
+    }
+
+    FVector3 FMatrix4x4::GetYAxis() const
+    {
+        return FVector3(M[0][1], M[1][1], M[2][1]);
+    }
+
+    FVector3 FMatrix4x4::GetZAxis() const
+    {
+        return FVector3(M[0][2], M[1][2], M[2][2]);
+    }
+
     void FMatrix4x4::SetTranslation(const FVector3& Position)
     {
         M[3][0] = Position.X;
@@ -364,6 +430,39 @@ namespace core
         M[0][0] *= Scale.X;
         M[1][1] *= Scale.Y;
         M[2][2] *= Scale.Z;
+    }
+
+    void FMatrix4x4::LookAt(const FVector3& Postion, const FVector3& Center, const FVector3& Up)
+    {
+        FVector3 Forward = Center - Postion;
+        Forward.Normalize();
+
+        FVector3 Right = FVector3::Cross(Forward,  Up);
+        Right.Normalize();
+
+        FVector3 LocalUp = FVector3::Cross(Right, Forward);
+        LocalUp.Normalize();
+
+        M[0][0] = Right.X;
+        M[1][0] = Right.Y;
+        M[2][0] = Right.Z;
+
+        M[0][1] = LocalUp.X;
+        M[1][1] = LocalUp.Y;
+        M[2][1] = LocalUp.Z;
+
+        M[0][2] = Forward.X;
+        M[1][2] = Forward.Y;
+        M[2][2] = Forward.Z;
+
+        M[0][3] = 0;
+        M[1][3] = 0;
+        M[2][3] = 0;
+
+        M[3][0] = -FVector3::Dot(Postion, Right);
+        M[3][1] = -FVector3::Dot(Postion, LocalUp);
+        M[3][2] = -FVector3::Dot(Postion, Forward);
+        M[3][3] = 1.0f;
     }
 
     FMatrix4x4 FMatrix4x4::operator*(const FMatrix4x4& Matrix)
