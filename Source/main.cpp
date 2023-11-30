@@ -19,6 +19,7 @@
 
 #include "Objects/Game.h"
 #include "Rasterizer/LDRColor.h"
+#include "Others/Joystick.h"
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -186,6 +187,7 @@ int main(int, char**)
 
     std::unique_ptr<core::UGame> GameInstance = std::make_unique<core::UGame>();
     GameInstance->Initialize(ViewportWidth, ViewportHeight);
+    core::FJoystick Joystick;
     GLuint ImageTextureID = CreateTexture(ViewportWidth, ViewportHeight);
 
     double PreviousFrameTimeStamp = glfwGetTime();
@@ -209,23 +211,123 @@ int main(int, char**)
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
 
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        //  Process input.
+        if (ImGui::IsKeyDown(ImGuiKey_W))
+        {
+            Joystick.WDown = true ;
+        }
+        else
+        {
+            Joystick.WDown = false;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_S))
+        {
+            Joystick.SDown = true;
+        }
+        else
+        {
+            Joystick.SDown = false;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_A))
+        {
+            Joystick.ADown = true;
+        }
+        else
+        {
+            Joystick.ADown = false;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_D))
+        {
+            Joystick.DDown = true;
+        }
+        else
+        {
+            Joystick.DDown = false;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_Q))
+        {
+            Joystick.QDown = true;
+        }
+        else
+        {
+            Joystick.QDown = false;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_E))
+        {
+            Joystick.EDown = true;
+        }
+        else
+        {
+            Joystick.EDown = false;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
+        {
+            Joystick.LeftShiftDown = true;
+        }
+        else
+        {
+            Joystick.LeftShiftDown = false;
+        }
+
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+        {
+            Joystick.LeftButtonDown = true;
+        }
+        else
+        {
+            Joystick.LeftButtonDown = false;
+        }
+
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
+        {
+            Joystick.MiddleButtonDown = true;
+        }
+        else
+        {
+            Joystick.MiddleButtonDown = false;
+        }
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+        {
+            Joystick.RightButtonDown = true;
+        }
+        else
+        {
+            Joystick.RightButtonDown = false;
+        }
+
+        ImGuiIO& IO = ImGui::GetIO();
+
+        Joystick.XPos = static_cast<core::int32>(IO.MousePos.x);
+        Joystick.YPos = static_cast<core::int32>(IO.MousePos.y);
+        Joystick.ZPos += static_cast<core::int32>(IO.MouseWheel);
+
+        if (Joystick.ZPos < 1)
+        {
+            Joystick.ZPos = 1;
+        }
+
         //  Run resterizer
         double CurrentFrameTimeStamp = glfwGetTime();
         double DeltaTime = CurrentFrameTimeStamp - PreviousFrameTimeStamp;
         if (RunTick)
         {
             //  Seconds to milliseconds
-            GameInstance->Tick(static_cast<float>(DeltaTime * 1000));
+            GameInstance->Tick(Joystick, static_cast<float>(DeltaTime * 1000));
         }
         PreviousFrameTimeStamp = CurrentFrameTimeStamp;
         GameInstance->Render();
 
         UpdateTexture(ImageTextureID, ViewportWidth, ViewportHeight, GameInstance->GetLDRData());
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        // // Start the Dear ImGui frame
+        // ImGui_ImplOpenGL3_NewFrame();
+        // ImGui_ImplGlfw_NewFrame();
+        // ImGui::NewFrame();
 
         // 0.
         ImGui::Begin("Rasterizing View");
