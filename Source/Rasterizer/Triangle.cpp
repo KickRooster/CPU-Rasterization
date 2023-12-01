@@ -2,11 +2,11 @@
 
 namespace core
 {
-    FTriangle::FTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2)
+    FTriangle::FTriangle(const FVertex& InV0, const FVertex& InV1, const FVertex& InV2):
+    V0(InV0),
+    V1(InV1),
+    V2(InV2)
     {
-        this->V0 = V0;
-        this->V1 = V1;
-        this->V2 = V2;
     }
 
     FTriangle& FTriangle::operator=(const FTriangle& Triangle)

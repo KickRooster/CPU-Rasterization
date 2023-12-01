@@ -133,6 +133,7 @@
     <ClCompile Include="Source\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="Source\Components\SkeletalMeshComponent.cpp" />
     <ClCompile Include="Source\Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Source\Components\TransformComponent.cpp" />
     <ClCompile Include="Source\DesignPattern\ObserverPattern\Subject.cpp" />
     <ClCompile Include="Source\imgui\imgui.cpp" />
     <ClCompile Include="Source\imgui\imgui_demo.cpp" />
@@ -143,12 +144,14 @@
     <ClCompile Include="Source\Math\MathBase.cpp" />
     <ClCompile Include="Source\Math\Matrix4x4.cpp" />
     <ClCompile Include="Source\Math\Rect.cpp" />
+    <ClCompile Include="Source\Math\Vector2.cpp" />
     <ClCompile Include="Source\Math\Vector3.cpp" />
     <ClCompile Include="Source\Math\Vector4.cpp" />
     <ClCompile Include="Source\Objects\Actor.cpp" />
     <ClCompile Include="Source\Objects\Camera.cpp" />
     <ClCompile Include="Source\Objects\Game.cpp" />
     <ClCompile Include="Source\Objects\World.cpp" />
+    <ClCompile Include="Source\Others\Joystick.cpp" />
     <ClCompile Include="Source\Rasterizer\HDRColor.cpp" />
     <ClCompile Include="Source\Rasterizer\Driver.cpp" />
     <ClCompile Include="Source\Rasterizer\IrradianceBuffer.cpp" />
@@ -165,6 +168,7 @@
     <ClInclude Include="Source\backends\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="Source\Components\SkeletalMeshComponent.h" />
     <ClInclude Include="Source\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Source\Components\TransformComponent.h" />
     <ClInclude Include="Source\DesignPattern\ObserverPattern\Obeserver.h" />
     <ClInclude Include="Source\DesignPattern\ObserverPattern\Subject.h" />
     <ClInclude Include="Source\DesignPattern\SingletonPattern\Singleton.h" />
@@ -175,12 +179,14 @@
     <ClInclude Include="Source\Math\Matrix4x4.h" />
     <ClInclude Include="Source\Math\MathBase.h" />
     <ClInclude Include="Source\Math\Rect.h" />
+    <ClInclude Include="Source\Math\Vector2.h" />
     <ClInclude Include="Source\Math\Vector3.h" />
     <ClInclude Include="Source\Math\Vector4.h" />
     <ClInclude Include="Source\Objects\Actor.h" />
     <ClInclude Include="Source\Objects\Camera.h" />
     <ClInclude Include="Source\Objects\Game.h" />
     <ClInclude Include="Source\Objects\World.h" />
+    <ClInclude Include="Source\Others\Joystick.h" />
     <ClInclude Include="Source\Rasterizer\HDRColor.h" />
     <ClInclude Include="Source\Rasterizer\Driver.h" />
     <ClInclude Include="Source\Rasterizer\IrradianceBuffer.h" />

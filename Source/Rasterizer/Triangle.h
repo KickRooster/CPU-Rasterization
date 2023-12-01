@@ -10,7 +10,7 @@ namespace core
         FVertex V1;
         FVertex V2;
 
-        FTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2);
+        FTriangle(const FVertex& InV0, const FVertex& InV1, const FVertex& InV2);
         FTriangle& operator =(const FTriangle& Triangle);
     };
 }

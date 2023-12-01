@@ -47,8 +47,7 @@ namespace core
                 std::swap(StartX, EndX);
             }
 
-            //  XXX:    Hard code 0, 1, 0, 1.
-            IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 1, 0, 1));
+            IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, V0.Color);
             CurrentX1 += InvSlope1;
             CurrentX2 += InvSlope2;
 
@@ -79,8 +78,7 @@ namespace core
                 std::swap(StartX, EndX);
             }
 
-            //  XXX:    Hard code 0, 1, 0, 1
-            IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, FHDRColor(0, 1, 0, 1));
+            IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, V0.Color);
             CurrentX1 -= InvSlope1;
             CurrentX2 -= InvSlope2;
 
@@ -92,6 +90,8 @@ namespace core
     void URasterizer::DoStandard(const FTriangle& Triangle, FIrradianceBuffer& IrradianceBuffer) const
     {
         FTriangle SortedTriangle = SortByY(Triangle);
+
+        //  Till now, the original of the coordinate of Triangle is top-left, after viewport transformation.
 
         //  Check for trivial case of bottom-flat triangle.
         if (Equal(SortedTriangle.V1.Position.Y, SortedTriangle.V2.Position.Y))
@@ -113,13 +113,15 @@ namespace core
                 1.0f);
             FillUpBottomFlatTriangle(SortedTriangle.V0, SortedTriangle.V1, V3, IrradianceBuffer);
             //  Patch a line between two triangles.
-            int32 StartX = static_cast<int32>(round(SortedTriangle.V1.Position.X));
-            int32 EndX = static_cast<int32>(round(V3.Position.X));
-            if (EndX < StartX)
             {
-                std::swap(StartX, EndX);
+                int32 StartX = static_cast<int32>(round(SortedTriangle.V1.Position.X));
+                int32 EndX = static_cast<int32>(round(V3.Position.X));
+                if (EndX < StartX)
+                {
+                    std::swap(StartX, EndX);
+                }
+                IrradianceBuffer.FillUpHorizontal(static_cast<int32>(round(V3.Position.Y)), StartX, EndX, SortedTriangle.V0.Color);
             }
-            IrradianceBuffer.FillUpHorizontal(static_cast<int32>(round(V3.Position.Y)), StartX, EndX, FHDRColor(0, 1, 0, 1));
             FillUpTopFlatTriangle(SortedTriangle.V1, V3, SortedTriangle.V2, IrradianceBuffer);
         }
     }

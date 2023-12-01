@@ -13,32 +13,28 @@ namespace core
     {
         CurrentWorld = std::make_unique<UWorld>();
 
-        //  Clockwise.
-        FVertex Vertex0(-20.0, 20, 0, 1.0);
-        FVertex Vertex1(20, 20.0, 0, 1.0);
-        FVertex Vertex2(20.0, -20.0, 0, 1.0);
-        FVertex Vertex3(-20.0, -20.0, 0, 1.0);
-        FVertex Vertex4(0, -40.0, 0, 1.0);
-        FVertex Vertex5(40, 0, 0, 1.0);
+        FVertex Vertex0(-20.0, -20, 0, 1.0,      1.0, 0, 0, 1.0);
+        FVertex Vertex1(0, 20.0, 0, 1.0,         1.0, 0, 0, 1.0);
+        FVertex Vertex2(20.0, -20.0, 0, 1.0,     1.0, 0, 0, 1.0);
+        //FVertex Vertex3(0, 20.0, 0, 1.0, 0, 1.0, 0, 1.0);
+        //FVertex Vertex4(40.0, 20.0, 0, 1.0, 0, 1, 0, 1);
+        //FVertex Vertex5(20.0, -20.0, 0, 1.0, 0, 1, 0, 1);
         std::unique_ptr<UStaticMeshComponent> StaticMeshComponent = std::make_unique<UStaticMeshComponent>();
         StaticMeshComponent->AddVertex(Vertex0);
         StaticMeshComponent->AddVertex(Vertex1);
         StaticMeshComponent->AddVertex(Vertex2);
-        StaticMeshComponent->AddVertex(Vertex3);
-        StaticMeshComponent->AddVertex(Vertex4);
-        StaticMeshComponent->AddVertex(Vertex5);
+        //StaticMeshComponent->AddVertex(Vertex3);
+        //StaticMeshComponent->AddVertex(Vertex4);
+        //StaticMeshComponent->AddVertex(Vertex5);
+
+        //  Clockwise.
         StaticMeshComponent->AddIndex(0);
         StaticMeshComponent->AddIndex(1);
         StaticMeshComponent->AddIndex(2);
-        StaticMeshComponent->AddIndex(2);
-        StaticMeshComponent->AddIndex(3);
-        StaticMeshComponent->AddIndex(0);
-        StaticMeshComponent->AddIndex(3);
-        StaticMeshComponent->AddIndex(2);
-        StaticMeshComponent->AddIndex(4);
-        StaticMeshComponent->AddIndex(1);
-        StaticMeshComponent->AddIndex(5);
-        StaticMeshComponent->AddIndex(2);
+
+        //StaticMeshComponent->AddIndex(3);
+        //StaticMeshComponent->AddIndex(4);
+        //StaticMeshComponent->AddIndex(5);
 
         std::unique_ptr<UActor> TriangleActor = std::make_unique<UActor>();
         TriangleActor->RegisterStaticMeshComponent(std::move(StaticMeshComponent));
@@ -48,7 +44,7 @@ namespace core
         CameraActor->Aspect = static_cast<float>(ViewportWidth) / static_cast<float>(ViewportHeight);
         CameraActor->ZNear = 0.1f;
         CameraActor->ZFar = 1000.0f;
-        CameraActor->FieldOfViewY = Degree2Radian(120.0f);
+        CameraActor->FieldOfViewY = Degree2Radian(90.0f);
         CameraActor->Position = FVector3(0, 0, -40);
         CurrentWorld->AddCameraActor(std::move(CameraActor));
 
