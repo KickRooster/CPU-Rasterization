@@ -14,11 +14,28 @@ namespace core
     {
     }
 
+    FVector2::FVector2(const FVector2& Vector):
+    X(Vector.X),
+    Y(Vector.Y)
+    {
+
+    }
+
     FVector2& FVector2::operator=(const FVector2& Vector)
     {
         X = Vector.X;
         Y = Vector.Y;
 
         return *this;
+    }
+
+    FVector2 FVector2::operator-(const FVector2& Vector) const
+    {
+        return FVector2(X - Vector.X, Y - Vector.Y);
+    }
+
+    float FVector2::Cross(const FVector2& LHS, const FVector2& RHS)
+    {
+        return LHS.X * RHS.Y - RHS.X * LHS.Y;
     }
 }

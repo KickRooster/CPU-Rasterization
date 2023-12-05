@@ -1,4 +1,5 @@
 ﻿#include "Actor.h"
+#include "../Math/MathGlobal.h"
 
 namespace core
 {

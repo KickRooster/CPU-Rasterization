@@ -26,10 +26,3 @@
 #ifndef RADIAN_TO_DEGREE
 #define RADIAN_TO_DEGREE 57.295779513f
 #endif
-
-namespace core
-{
-    bool Equal(float Lhs, float Rhs);
-    float Degree2Radian(float Degree);
-    float Radian2Degree(float Radian);
-}

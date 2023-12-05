@@ -18,6 +18,14 @@ namespace core
     {
     }
 
+    FVector4::FVector4(const FVector4& Vector):
+    X(Vector.X),
+    Y(Vector.Y),
+    Z(Vector.Z),
+    W(Vector.W)
+    {
+    }
+
     FVector4& FVector4::operator=(const FVector4& Vector)
     {
         X = Vector.X ;

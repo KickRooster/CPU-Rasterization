@@ -1,7 +1,5 @@
 ﻿#include "Game.h"
-
-#include <algorithm>
-
+#include "../Math/MathGlobal.h"
 #include "../Components/StaticMeshComponent.h"
 #include "../Rasterizer/Vertex.h"
 #include "Camera.h"
@@ -13,19 +11,13 @@ namespace core
     {
         CurrentWorld = std::make_unique<UWorld>();
 
-        FVertex Vertex0(-20.0, -20, 0, 1.0,      1.0, 0, 0, 1.0);
-        FVertex Vertex1(0, 20.0, 0, 1.0,         1.0, 0, 0, 1.0);
-        FVertex Vertex2(20.0, -20.0, 0, 1.0,     1.0, 0, 0, 1.0);
-        //FVertex Vertex3(0, 20.0, 0, 1.0, 0, 1.0, 0, 1.0);
-        //FVertex Vertex4(40.0, 20.0, 0, 1.0, 0, 1, 0, 1);
-        //FVertex Vertex5(20.0, -20.0, 0, 1.0, 0, 1, 0, 1);
+        FVertex Vertex0(FVector4(-20.0, -20, 0, 1.0), FHDRColor::Red, FVector2(0, 0));
+        FVertex Vertex1(FVector4(0, 20.0, 0, 1.0), FHDRColor::Green, FVector2(0.5, 1.0));
+        FVertex Vertex2(FVector4(20.0, -20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
         std::unique_ptr<UStaticMeshComponent> StaticMeshComponent = std::make_unique<UStaticMeshComponent>();
         StaticMeshComponent->AddVertex(Vertex0);
         StaticMeshComponent->AddVertex(Vertex1);
         StaticMeshComponent->AddVertex(Vertex2);
-        //StaticMeshComponent->AddVertex(Vertex3);
-        //StaticMeshComponent->AddVertex(Vertex4);
-        //StaticMeshComponent->AddVertex(Vertex5);
 
         //  Clockwise.
         StaticMeshComponent->AddIndex(0);

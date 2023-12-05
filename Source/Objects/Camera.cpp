@@ -1,5 +1,6 @@
 ﻿#include "Camera.h"
 #include "../Math/Vector2.h"
+#include "../Math/MathGlobal.h"
 
 namespace core
 {

@@ -141,7 +141,7 @@
     <ClCompile Include="Source\imgui\imgui_tables.cpp" />
     <ClCompile Include="Source\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\Math\MathBase.cpp" />
+    <ClCompile Include="Source\Math\MathGlobal.cpp" />
     <ClCompile Include="Source\Math\Matrix4x4.cpp" />
     <ClCompile Include="Source\Math\Rect.cpp" />
     <ClCompile Include="Source\Math\Vector2.cpp" />
@@ -176,6 +176,7 @@
     <ClInclude Include="Source\imgui\imgui.h" />
     <ClInclude Include="Source\imgui\imgui_internal.h" />
     <ClInclude Include="Source\Include\Core.h" />
+    <ClInclude Include="Source\Math\MathGlobal.h" />
     <ClInclude Include="Source\Math\Matrix4x4.h" />
     <ClInclude Include="Source\Math\MathBase.h" />
     <ClInclude Include="Source\Math\Rect.h" />

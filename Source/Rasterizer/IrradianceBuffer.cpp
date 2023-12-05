@@ -35,6 +35,21 @@ namespace core
         }
     }
 
+    bool FIrradianceBuffer::PixelPostionValid(int32 Y, int32 X) const
+    {
+        if (Y < 0 || Y >= Height)
+        {
+            return false;
+        }
+
+        if (X < 0 || X >= Width)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     void FIrradianceBuffer::FillUpHorizontal(int32 Y, int32 StartX, int32 EndX, const FHDRColor& Color)
     {
         if (Y < 0 || Y >= Height)
@@ -49,6 +64,16 @@ namespace core
         {
             HDRData[Y][i] = Color;
         }
+    }
+
+    void FIrradianceBuffer::FillUpOnePixel(int32 Y, int32 X, const FHDRColor& Color)
+    {
+        if (Y < 0 || Y >= Height)
+        {
+            return;
+        }
+
+        HDRData[Y][X] = Color;
     }
 
     void FIrradianceBuffer::ToneMaping()

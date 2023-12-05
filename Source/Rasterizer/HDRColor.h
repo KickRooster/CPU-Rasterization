@@ -14,5 +14,10 @@ namespace core
         FHDRColor(float InR, float InG, float InB, float InA);
         FHDRColor(const FHDRColor& Color);
         FHDRColor& operator =(const FHDRColor& Color);
+        FHDRColor operator +(const FHDRColor& Value);
+        FHDRColor operator * (float Scale) const;
+        static FHDRColor Red;
+        static FHDRColor Green;
+        static FHDRColor Blue;
     };
 }

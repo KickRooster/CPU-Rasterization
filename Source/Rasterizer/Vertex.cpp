@@ -19,6 +19,14 @@ namespace core
     {
     }
 
+    FVertex::FVertex(const FVector4& InPosition, const FHDRColor& InColor, const FVector2& InUV):
+    Position(InPosition),
+    Color(InColor),
+    UV(InUV)
+    {
+
+    }
+
     FVertex& FVertex::operator=(const FVertex& Vertex)
     {
         Position = Vertex.Position;

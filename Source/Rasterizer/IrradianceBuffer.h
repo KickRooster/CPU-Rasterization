@@ -20,7 +20,9 @@ namespace core
     public:
         FIrradianceBuffer(int32 InWidth, int32 InHeight);
         void Clear(const FHDRColor& Color);
+        bool PixelPostionValid(int32 Y, int32 X) const;
         void FillUpHorizontal(int32 Y, int32 StartX, int32 EndX, const FHDRColor& Color);
+        void FillUpOnePixel(int32 Y, int32 X, const FHDRColor& Color);
         void ToneMaping();
         uint8 * GetRawLDRData() const;
         ~FIrradianceBuffer();
