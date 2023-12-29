@@ -9,8 +9,13 @@ namespace core
     class URasterizer : public Singleton<URasterizer>
     {
         FTriangle SortByY(const FTriangle& Triangle) const;
-        void FillUpBottomFlatTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const;
-        void FillUpTopFlatTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const;
+        FHDRColor GetInterpolatedColorOfGeneralCaseTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3) const;
+        void FillUpBottomFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const;
+        void FillUpBottomFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const;
+        void FillUpALineL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, FIrradianceBuffer& IrradianceBuffer) const;
+        void FillUpALineR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, FIrradianceBuffer& IrradianceBuffer) const;
+        void FillUpTopFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const;
+        void FillUpTopFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const;
         void DoStandard(const FTriangle& Triangle, FIrradianceBuffer& IrradianceBuffer) const;
 
     public:

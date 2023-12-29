@@ -14,6 +14,15 @@ namespace core
         FVertex Vertex0(FVector4(-20.0, -20, 0, 1.0), FHDRColor::Red, FVector2(0, 0));
         FVertex Vertex1(FVector4(0, 20.0, 0, 1.0), FHDRColor::Green, FVector2(0.5, 1.0));
         FVertex Vertex2(FVector4(20.0, -20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
+
+        //FVertex Vertex0(FVector4(-20.0, 20, 0, 1.0), FHDRColor::Red, FVector2(0, 0));
+        //FVertex Vertex1(FVector4(20, 20.0, 0, 1.0), FHDRColor::Green, FVector2(0.5, 1.0));
+        //FVertex Vertex2(FVector4(0, -20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
+
+        //FVertex Vertex0(FVector4(-20.0, 20, 0, 1.0), FHDRColor::Red, FVector2(0, 0));
+        //FVertex Vertex1(FVector4(20, 40.0, 0, 1.0), FHDRColor::Green, FVector2(0.5, 1.0));
+        //FVertex Vertex2(FVector4(20, -20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
+
         std::unique_ptr<UStaticMeshComponent> StaticMeshComponent = std::make_unique<UStaticMeshComponent>();
         StaticMeshComponent->AddVertex(Vertex0);
         StaticMeshComponent->AddVertex(Vertex1);

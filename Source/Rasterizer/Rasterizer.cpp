@@ -25,6 +25,29 @@ namespace core
         return SortedTriangle;
     }
 
+    FHDRColor URasterizer::GetInterpolatedColorOfGeneralCaseTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3) const
+    {
+        FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
+        FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
+        FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
+        FVector2 PointP = FVector2(V3.Position.X, V3.Position.Y);
+
+        float Area012 = GetArea(Point0, Point1, Point2);
+
+        float Area1P2 = GetArea(PointP, Point1, Point2);
+        float Point0Weight = Area1P2 / Area012;
+
+        float Area2P0 = GetArea(PointP, Point2, Point0);
+        float Point1Weight = Area2P0 / Area012;
+
+        float Area0P1 = GetArea(PointP, Point0, Point1);
+        float Point2Weight = Area0P1 / Area012;
+
+        FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
+
+        return InterpolatedColor;
+    }
+
     //(0,0)-----------------
     //     |      V0-------V1
     //     |       \      /
@@ -32,7 +55,7 @@ namespace core
     //     |         \  /
     //     |          V2
     //  V0, V1 and V2 have been clipped, they layed in [0, 1].
-    void URasterizer::FillUpBottomFlatTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpBottomFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
     {
         float InvSlope0 = (V0.Position.X - V2.Position.X) / (V0.Position.Y - V2.Position.Y);
         float InvSlope1 = (V1.Position.X - V2.Position.X) / (V1.Position.Y - V2.Position.Y);
@@ -60,7 +83,7 @@ namespace core
                 FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
                 FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
                 FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
-                FVector2 PointP = FVector2(CurrentX0 + i, CurrentY);
+                FVector2 PointP = FVector2(static_cast<float>(i), CurrentY);
 
                 float Area012 = GetArea(Point0, Point1, Point2);
 
@@ -83,30 +106,160 @@ namespace core
             --ScanLineY;
         }
         while(ScanLineY > V0V1Y);
-        ///////////////////////////////////////////
+    }
 
-        // float InvSlope1 = (V1.Position.X - V0.Position.X) / (V1.Position.Y - V0.Position.Y);
-        // float InvSlope2 = (V2.Position.X - V0.Position.X) / (V2.Position.Y - V0.Position.Y);
-        //
-        // float CurrentX1 = V0.Position.X;
-        // float CurrentX2 = V0.Position.X;
-        //
-        // int32 V0Y = static_cast<int32>(round(V0.Position.Y));
-        // int32 V1V2Y = static_cast<int32>(round(V1.Position.Y));
-        //
-        // int32 ScanLineY = V0Y;
-        // do
-        // {
-        //     int32 StartX = static_cast<int32>(round(CurrentX1));
-        //     int32 EndX = static_cast<int32>(round(CurrentX2));
-        //
-        //     IrradianceBuffer.FillUpHorizontal(ScanLineY, StartX, EndX, V0.Color);
-        //     CurrentX1 += InvSlope1;
-        //     CurrentX2 += InvSlope2;
-        //
-        //     ++ScanLineY;
-        // }
-        // while(ScanLineY < V1V2Y);
+    //(0,0)-----------------
+    //     |      V1-------V0
+    //     |       \      /
+    //     |        \    /
+    //     |         \  /
+    //     |          V2
+    //  V0, V1 and V2 have been clipped, they layed in [0, 1].
+    void URasterizer::FillUpBottomFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
+    {
+        float InvSlope1 = (V1.Position.X - V2.Position.X) / (V1.Position.Y - V2.Position.Y);
+        float InvSlope0 = (V0.Position.X - V2.Position.X) / (V0.Position.Y - V2.Position.Y);
+
+        float CurrentX1 = V2.Position.X;
+        float CurrentX0 = V2.Position.X;
+        float CurrentY = V2.Position.Y;
+
+        int32 V2Y = static_cast<int32>(round(V2.Position.Y));
+        int32 V1V0Y = static_cast<int32>(round(V1.Position.Y));
+
+        int32 ScanLineY = V2Y;
+        do
+        {
+            int32 StartX = static_cast<int32>(round(CurrentX1));
+            int32 EndX = static_cast<int32>(round(CurrentX0));
+
+            for (int32 i = StartX; i <= EndX; ++i)
+            {
+                if (!IrradianceBuffer.PixelPostionValid(ScanLineY, i))
+                {
+                    continue;
+                }
+
+                FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
+                FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
+                FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
+                FVector2 PointP = FVector2(static_cast<float>(i), CurrentY);
+
+                float Area102 = GetArea(Point1, Point0, Point2);
+
+                float Area2P0 = GetArea(PointP, Point2, Point0);
+                float Point1Weight = Area2P0 / Area102;
+
+                float Area1P2 = GetArea(PointP, Point1, Point2);
+                float Point0Weight = Area1P2 / Area102;
+
+                float Area0P1 = GetArea(PointP, Point0, Point1);
+                float Point2Weight = Area0P1 / Area102;
+
+                FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
+                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+            }
+
+            CurrentX0 -= InvSlope0;
+            CurrentX1 -= InvSlope1;
+            CurrentY -= 1.0f;
+            --ScanLineY;
+        }
+        while(ScanLineY > V1V0Y);
+    }
+
+    //(0,0)-----------------
+    //     |           V0
+    //     |         / |
+    //     |        /  |
+    //     |       /   |
+    //     |      V1---V3
+    //     |       \   |
+    //     |        \  |
+    //     |         \ |
+    //     |           V2
+    //  V0, V1 and V2 have been clipped, they layed in [0, 1].
+    void URasterizer::FillUpALineL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, FIrradianceBuffer& IrradianceBuffer) const
+    {
+        int32 StartX = static_cast<int32>(round(V1.Position.X));
+        int32 EndX = static_cast<int32>(round(V3.Position.X));
+
+        float CurrentY = V1.Position.Y;
+        int32 ScanLineY = static_cast<int32>(round(V1.Position.Y));
+
+        for (int32 i = StartX; i <= EndX; ++i)
+        {
+            if (!IrradianceBuffer.PixelPostionValid(ScanLineY, i))
+            {
+                continue;
+            }
+
+            FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
+            FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
+            FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
+            FVector2 PointP = FVector2(static_cast<float>(i), CurrentY);
+
+            float Area012 = GetArea(Point0, Point1, Point2);
+
+            float Area1P2 = GetArea(PointP, Point1, Point2);
+            float Point0Weight = Area1P2 / Area012;
+
+            float Area2P0 = GetArea(PointP, Point2, Point0);
+            float Point1Weight = Area2P0 / Area012;
+
+            float Area0P1 = GetArea(PointP, Point0, Point1);
+            float Point2Weight = Area0P1 / Area012;
+
+            FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
+            IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+        }
+    }
+
+    //(0,0)-----------------
+    //     |           V0
+    //     |           | \
+    //     |           |  \
+    //     |           |   \
+    //     |           V3---V1
+    //     |           |   /
+    //     |           |  /
+    //     |           | /
+    //     |           V2
+    //  V0, V1 and V2 have been clipped, they layed in [0, 1].
+    void URasterizer::FillUpALineR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, FIrradianceBuffer& IrradianceBuffer) const
+    {
+        int32 StartX = static_cast<int32>(round(V3.Position.X));
+        int32 EndX = static_cast<int32>(round(V1.Position.X));
+
+        float CurrentY = V3.Position.Y;
+        int32 ScanLineY = static_cast<int32>(round(V3.Position.Y));
+
+        for (int32 i = StartX; i <= EndX; ++i)
+        {
+            if (!IrradianceBuffer.PixelPostionValid(ScanLineY, i))
+            {
+                continue;
+            }
+
+            FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
+            FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
+            FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
+            FVector2 PointP = FVector2(static_cast<float>(i), CurrentY);
+
+            float Area012 = GetArea(Point0, Point1, Point2);
+
+            float Area1P2 = GetArea(PointP, Point1, Point2);
+            float Point0Weight = Area1P2 / Area012;
+
+            float Area2P0 = GetArea(PointP, Point2, Point0);
+            float Point1Weight = Area2P0 / Area012;
+
+            float Area0P1 = GetArea(PointP, Point0, Point1);
+            float Point2Weight = Area0P1 / Area012;
+
+            FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
+            IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+        }
     }
 
     //(0,0)-----------------
@@ -115,7 +268,7 @@ namespace core
     //     |        /    \
     //     |       /      \
     //     |      V1-------V2
-    void URasterizer::FillUpTopFlatTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpTopFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
     {
         float InvSlope1 = (V1.Position.X - V0.Position.X) / (V1.Position.Y - V0.Position.Y);
         float InvSlope2 = (V2.Position.X - V0.Position.X) / (V2.Position.Y - V0.Position.Y);
@@ -143,7 +296,66 @@ namespace core
                 FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
                 FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
                 FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
-                FVector2 PointP = FVector2(CurrentX1 + i, CurrentY);
+                FVector2 PointP = FVector2(static_cast<float>(i), CurrentY);
+
+                float Area012 = GetArea(Point0, Point1, Point2);
+
+                float Area1P2 = GetArea(PointP, Point1, Point2);
+                float Point0Weight = Area1P2 / Area012;
+
+                float Area2P0 = GetArea(PointP, Point2, Point0);
+                float Point1Weight = Area2P0 / Area012;
+
+                float Area0P1 = GetArea(PointP, Point0, Point1);
+                float Point2Weight = Area0P1 / Area012;
+
+                FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
+                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+            }
+
+            CurrentX1 += InvSlope1;
+            CurrentX2 += InvSlope2;
+            CurrentY += 1.0f;
+            ++ScanLineY;
+        }
+        while (ScanLineY < V1V2Y);
+    }
+
+    //(0,0)-----------------
+    //     |          V0
+    //     |         /  \
+    //     |        /    \
+    //     |       /      \
+    //     |      V2-------V1
+    void URasterizer::FillUpTopFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, FIrradianceBuffer& IrradianceBuffer) const
+    {
+        float InvSlope2 = (V2.Position.X - V0.Position.X) / (V2.Position.Y - V0.Position.Y);
+        float InvSlope1 = (V1.Position.X - V0.Position.X) / (V1.Position.Y - V0.Position.Y);
+
+        float CurrentX2 = V0.Position.X;
+        float CurrentX1 = V0.Position.X;
+        float CurrentY = V0.Position.Y;
+
+        int32 V0Y = static_cast<int32>(round(V0.Position.Y));
+        int32 V1V2Y = static_cast<int32>(round(V2.Position.Y));
+
+        int32 ScanLineY = V0Y;
+        do
+        {
+            int32 StartX = static_cast<int32>(round(CurrentX2));
+            int32 EndX = static_cast<int32>(round(CurrentX1));
+
+            for (int32 i = StartX; i <= EndX; ++i)
+            {
+                if (!IrradianceBuffer.PixelPostionValid(ScanLineY, i))
+                {
+                    continue;
+                }
+
+                FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
+                FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
+                FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
+                FVector2 PointP = FVector2(static_cast<float>(i), CurrentY);
 
                 float Area012 = GetArea(Point0, Point1, Point2);
 
@@ -185,11 +397,11 @@ namespace core
         {
             if (SortedTriangle.V0.Position.X <= SortedTriangle.V1.Position.X)
             {
-                FillUpBottomFlatTriangle(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, IrradianceBuffer);
+                FillUpBottomFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, IrradianceBuffer);
             }
             else
             {
-                FillUpBottomFlatTriangle(SortedTriangle.V1, SortedTriangle.V0, SortedTriangle.V2, IrradianceBuffer);
+                FillUpBottomFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, IrradianceBuffer);
             }
         }
         //(0,0)-----------------
@@ -203,14 +415,14 @@ namespace core
         {
             if (SortedTriangle.V1.Position.X <= SortedTriangle.V2.Position.X)
             {
-                FillUpTopFlatTriangle(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, IrradianceBuffer);
+                FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, IrradianceBuffer);
             }
             else
             {
-                FillUpTopFlatTriangle(SortedTriangle.V1, SortedTriangle.V2, SortedTriangle.V1, IrradianceBuffer);
+                FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, IrradianceBuffer);
             }
         }
-        //  Gneral case - split the triangle in a topflat and bottom-flat one.
+        //  Gneral case - split the triangle in a top-flat and bottom-flat one.
         else
         {
             FVertex V3 = FVertex(
@@ -218,18 +430,48 @@ namespace core
                 SortedTriangle.V1.Position.Y,
                 SortedTriangle.V1.Position.Z,   //  TODO:   Process 2d point, discard z component.
                 1.0f);
-            FillUpBottomFlatTriangle(SortedTriangle.V0, SortedTriangle.V1, V3, IrradianceBuffer);
+            V3.Color = GetInterpolatedColorOfGeneralCaseTriangle(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3);
+
+            //(0,0)-----------------
+            //     |          V0
+            //     |         /  \
+            //     |        /    \
+            //     |       /      \
+            //     |      V1-------V3
+            if (SortedTriangle.V1.Position.X <= V3.Position.X)
+            {
+                FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1,V3, IrradianceBuffer);
+            }
+            else
+            {
+                FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, V3, IrradianceBuffer);
+            }
+
             //  Patch a line between two triangles.
             {
-                int32 StartX = static_cast<int32>(round(SortedTriangle.V1.Position.X));
-                int32 EndX = static_cast<int32>(round(V3.Position.X));
-                if (EndX < StartX)
+                if (SortedTriangle.V1.Position.X <= V3.Position.X)
                 {
-                    std::swap(StartX, EndX);
+                    FillUpALineL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, IrradianceBuffer);
                 }
-                IrradianceBuffer.FillUpHorizontal(static_cast<int32>(round(V3.Position.Y)), StartX, EndX, SortedTriangle.V0.Color);
+                else
+                {
+                    FillUpALineR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, IrradianceBuffer);
+                }
             }
-            FillUpTopFlatTriangle(SortedTriangle.V1, V3, SortedTriangle.V2, IrradianceBuffer);
+            //(0,0)-----------------
+            //     |      V1-------V3
+            //     |       \      /
+            //     |        \    /
+            //     |         \  /
+            //     |          V2
+            if (SortedTriangle.V1.Position.X <= V3.Position.X)
+            {
+                FillUpBottomFlatTriangleL2R(SortedTriangle.V1, V3, SortedTriangle.V2, IrradianceBuffer);
+            }
+            else
+            {
+                FillUpBottomFlatTriangleR2L(SortedTriangle.V1, V3, SortedTriangle.V2, IrradianceBuffer);
+            }
         }
     }
 
