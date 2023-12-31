@@ -36,6 +36,14 @@ namespace core
         }
     }
 
+    void UDriver::RecordCameraSpaceZ(FPrimitiveList& PrimitiveList) const
+    {
+        for (SIZE_T i = 0; i < PrimitiveList.VertexList.size(); ++i)
+        {
+            PrimitiveList.VertexList[i].CameraSpaceZ = PrimitiveList.VertexList[i].Position.Z;
+        }
+    }
+
     void UDriver::Project2NDC(FPrimitiveList& PrimitiveList) const
     {
         for (SIZE_T i = 0; i < PrimitiveList.VertexList.size(); ++i)
@@ -47,14 +55,14 @@ namespace core
         }
     }
 
-    void UDriver::Rasterize(FPrimitiveList& PrimitiveList, FIrradianceBuffer& IrradianceBuffer) const
+    void UDriver::Rasterize(FPrimitiveList& PrimitiveList, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
         PrimitiveList.BeforeRasterizing();
         {
             while (PrimitiveList.TopIsValid())
             {
                 FTriangle Triangle = PrimitiveList.PopTriangle();
-                URasterizer::Instance()->RasterizeTriangle(Triangle, IrradianceBuffer);
+                URasterizer::Instance()->RasterizeTriangle(Triangle, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }
         PrimitiveList.PostRasterizing();
@@ -70,7 +78,7 @@ namespace core
         UpdateViewportMatrix();
     }
 
-    void UDriver::DrawActor(UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer)
+    void UDriver::DrawActor(UActor& Actor, const UCamera& Camera, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer)
     {
         if (Actor.GetStaticMeshComponent())
         {
@@ -79,6 +87,8 @@ namespace core
             Transform(TransformedPrimitiveList, Actor.GetLocal2WorldMatrix());
             //  Transform world to camera.
             Transform(TransformedPrimitiveList, Camera.GetWorld2LocalMatrix());
+            //  Record camera space z used for perspective corrected interpolation later.
+            RecordCameraSpaceZ(TransformedPrimitiveList);
             //  Transform camera to CVV.
             Transform(TransformedPrimitiveList, Camera.GetPerspectiveProjectionMatrix());
             //  TODO:   Clip.
@@ -86,7 +96,7 @@ namespace core
             Project2NDC(TransformedPrimitiveList);
             //  Transform NDC to viewport.
             Transform(TransformedPrimitiveList, ViewportMat);
-            Rasterize(TransformedPrimitiveList, IrradianceBuffer);
+            Rasterize(TransformedPrimitiveList, bPerspectiveCorrectInterpolation, IrradianceBuffer);
         }
     }
 }

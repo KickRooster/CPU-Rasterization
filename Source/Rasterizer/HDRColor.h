@@ -16,6 +16,7 @@ namespace core
         FHDRColor& operator =(const FHDRColor& Color);
         FHDRColor operator +(const FHDRColor& Value);
         FHDRColor operator * (float Scale) const;
+        FHDRColor operator / (float Scale) const;
         static FHDRColor Red;
         static FHDRColor Green;
         static FHDRColor Blue;

@@ -17,6 +17,6 @@ namespace core
         void AddCameraActor(std::unique_ptr<UCamera> CameraActor);
         void AddBasicActor(std::unique_ptr<UActor> BasicActor);
         void Tick(const FJoystick& Joystick, float DeltaTime);
-        void Render(FIrradianceBuffer& IrradianceBuffer);
+        void Render(bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer);
     };
 }

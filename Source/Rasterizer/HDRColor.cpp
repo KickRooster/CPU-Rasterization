@@ -46,6 +46,11 @@ namespace core
         return  FHDRColor(R * Scale, G * Scale, B * Scale, A * Scale);
     }
 
+    FHDRColor FHDRColor::operator/(float Scale) const
+    {
+        return  FHDRColor(R / Scale, G / Scale, B / Scale, A / Scale);
+    }
+
     FHDRColor FHDRColor::Red = FHDRColor(1.0, 0, 0, 1.0);
     FHDRColor FHDRColor::Green = FHDRColor(0, 1.0, 0, 1.0);
     FHDRColor FHDRColor::Blue = FHDRColor(0, 0, 1.0, 1.0);

@@ -35,11 +35,12 @@ namespace core
         void UpdateViewportMatrix();
 
         void Transform(FPrimitiveList& PrimitiveList, const FMatrix4x4& Matrix) const;
+        void RecordCameraSpaceZ(FPrimitiveList& PrimitiveList) const;
         void Project2NDC(FPrimitiveList& PrimitiveList) const;
-        void Rasterize(FPrimitiveList& PrimitiveList, FIrradianceBuffer& IrradianceBuffer) const;
+        void Rasterize(FPrimitiveList& PrimitiveList, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const;
 
     public:
         void SetViewport(int32 X, int32 Y, int32 Width, int32 Height);
-        void DrawActor(UActor& Actor, const UCamera& Camera, FIrradianceBuffer& IrradianceBuffer);
+        void DrawActor(UActor& Actor, const UCamera& Camera, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer);
     };
 }

@@ -31,11 +31,11 @@ namespace core
         }
     }
 
-    void UWorld::Render(FIrradianceBuffer& IrradianceBuffer)
+    void UWorld::Render(bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer)
     {
         for (SIZE_T i = 0; i < BasicActorList.size(); ++i)
         {
-            UDriver::Instance()->DrawActor(*BasicActorList[i], *DefaultCamera, IrradianceBuffer);
+            UDriver::Instance()->DrawActor(*BasicActorList[i], *DefaultCamera, bPerspectiveCorrectInterpolation, IrradianceBuffer);
         }
     }
 }

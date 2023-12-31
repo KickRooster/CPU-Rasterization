@@ -14,7 +14,7 @@ namespace core
     public:
         void Initialize(int32 ViewportWidth, int32 ViewportHeight);
         void Tick(const FJoystick& Joystick, float DeltaTime);
-        void Render();
+        void Render(bool bPerspectiveCorrectInterpolation);
         uint8 * GetLDRData() const;
         void ShutDown();
     };

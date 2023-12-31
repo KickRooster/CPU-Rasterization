@@ -58,10 +58,10 @@ namespace core
         CurrentWorld->Tick(Joystick, DeltaTime);
     }
 
-    void UGame::Render()
+    void UGame::Render(bool bPerspectiveCorrectInterpolation)
     {
         IrradianceBuffer->Clear(FHDRColor(0, 0.2f, 0.4f, 1.0f));
-        CurrentWorld->Render(*IrradianceBuffer);
+        CurrentWorld->Render(bPerspectiveCorrectInterpolation, *IrradianceBuffer);
         IrradianceBuffer->ToneMaping();
     }
 

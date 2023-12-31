@@ -12,6 +12,7 @@ namespace core
         FHDRColor Color;
         FVector2 UV;
         //  TODO, normal tangent, e.g.
+        float CameraSpaceZ;     //  Used for perspective corrected interpolation.
 
         FVertex();
         FVertex(float X, float Y, float Z, float W);

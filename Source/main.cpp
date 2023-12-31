@@ -184,6 +184,7 @@ int main(int, char**)
 
     core::int32 ViewportWidth = 512;
     core::int32 ViewportHeight = 512;
+    bool bPerspectiveCorrectInterpolation = false;
 
     std::unique_ptr<core::UGame> GameInstance = std::make_unique<core::UGame>();
     GameInstance->Initialize(ViewportWidth, ViewportHeight);
@@ -320,25 +321,27 @@ int main(int, char**)
             GameInstance->Tick(Joystick, static_cast<float>(DeltaTime * 1000));
         }
         PreviousFrameTimeStamp = CurrentFrameTimeStamp;
-        GameInstance->Render();
+
+        ImGui::Begin("Editor panel");
+        {
+            ImGui::Checkbox("Perspective-Correct Interpolation", &bPerspectiveCorrectInterpolation);
+        }
+        ImGui::End();
+
+        GameInstance->Render(bPerspectiveCorrectInterpolation);
 
         UpdateTexture(ImageTextureID, ViewportWidth, ViewportHeight, GameInstance->GetLDRData());
-
-        // // Start the Dear ImGui frame
-        // ImGui_ImplOpenGL3_NewFrame();
-        // ImGui_ImplGlfw_NewFrame();
-        // ImGui::NewFrame();
 
         // 0.
         ImGui::Begin("Rasterizing View");
         ImGui::Image((void*)(intptr_t)ImageTextureID, ImVec2(static_cast<float>(ViewportWidth), static_cast<float>(ViewportHeight)));
         ImGui::End();
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+        // Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+        // Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
             static float f = 0.0f;
             static int counter = 0;
@@ -363,16 +366,6 @@ int main(int, char**)
             }
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
-
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
             ImGui::End();
         }
 
