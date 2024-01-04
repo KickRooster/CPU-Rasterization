@@ -86,6 +86,44 @@ namespace core
         return InterpolatedColor;
     }
 
+    FVector2 URasterizer::GetInterpolatedUVOfGeneralCaseTriangle(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, bool bPerspectiveCorrectInterpolation) const
+    {
+        FVector2 Point0 = FVector2(V0.Position.X, V0.Position.Y);
+        FVector2 Point1 = FVector2(V1.Position.X, V1.Position.Y);
+        FVector2 Point2 = FVector2(V2.Position.X, V2.Position.Y);
+        FVector2 PointP = FVector2(V3.Position.X, V3.Position.Y);
+
+        float Area012 = GetArea(Point0, Point1, Point2);
+
+        float Area1P2 = GetArea(PointP, Point1, Point2);
+        float Point0Weight = Area1P2 / Area012;
+
+        float Area2P0 = GetArea(PointP, Point2, Point0);
+        float Point1Weight = Area2P0 / Area012;
+
+        float Area0P1 = GetArea(PointP, Point0, Point1);
+        float Point2Weight = Area0P1 / Area012;
+
+        FVector2 InterpolatedUV;
+
+        if (bPerspectiveCorrectInterpolation)
+        {
+            float Zt = 1.0f / (Point0Weight / V0.CameraSpaceZ + Point1Weight / V1.CameraSpaceZ + Point2Weight / V2.CameraSpaceZ);
+
+            InterpolatedUV = (
+                V0.UV * (Point0Weight / V0.CameraSpaceZ) +
+                V1.UV * (Point1Weight / V1.CameraSpaceZ) +
+                V2.UV * (Point2Weight / V2.CameraSpaceZ)
+                ) / (1 / Zt);
+        }
+        else
+        {
+            InterpolatedUV = V0.UV * Point0Weight + V1.UV * Point1Weight + V2.UV * Point2Weight;
+        }
+
+        return InterpolatedUV;
+    }
+
     //(0,0)-----------------
     //     |      V0-------V1
     //     |       \      /
@@ -93,7 +131,7 @@ namespace core
     //     |         \  /
     //     |          V2
     //  V0, V1 and V2 have been clipped, they layed in [0, 1].
-    void URasterizer::FillUpBottomFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpBottomFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
         float InvSlope0 = (V0.Position.X - V2.Position.X) / (V0.Position.Y - V2.Position.Y);
         float InvSlope1 = (V1.Position.X - V2.Position.X) / (V1.Position.Y - V2.Position.Y);
@@ -102,14 +140,14 @@ namespace core
         float CurrentX1 = V2.Position.X;
         float CurrentY = V2.Position.Y;
 
-        int32 V2Y = static_cast<int32>(round(V2.Position.Y));
-        int32 V0V1Y = static_cast<int32>(round(V0.Position.Y));
+        int32 V2Y = static_cast<int32>(roundf(V2.Position.Y));
+        int32 V0V1Y = static_cast<int32>(roundf(V0.Position.Y));
 
         int32 ScanLineY = V2Y;
         do
         {
-            int32 StartX = static_cast<int32>(round(CurrentX0));
-            int32 EndX = static_cast<int32>(round(CurrentX1));
+            int32 StartX = static_cast<int32>(roundf(CurrentX0));
+            int32 EndX = static_cast<int32>(roundf(CurrentX1));
 
             for (int32 i = StartX; i <= EndX; ++i)
             {
@@ -144,12 +182,26 @@ namespace core
                         V2.Color * (Point2Weight / V2.CameraSpaceZ)
                         ) / (1 / Zt);
 
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = (
+                        V0.UV * (Point0Weight / V0.CameraSpaceZ) +
+                        V1.UV * (Point1Weight / V1.CameraSpaceZ) +
+                        V2.UV * (Point2Weight / V2.CameraSpaceZ)
+                        ) / (1 / Zt);
+
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
                 else
                 {
                     FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = V0.UV * Point0Weight + V1.UV * Point1Weight + V2.UV * Point2Weight;
+
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
             }
 
@@ -168,7 +220,7 @@ namespace core
     //     |         \  /
     //     |          V2
     //  V0, V1 and V2 have been clipped, they layed in [0, 1].
-    void URasterizer::FillUpBottomFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpBottomFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
         float InvSlope1 = (V1.Position.X - V2.Position.X) / (V1.Position.Y - V2.Position.Y);
         float InvSlope0 = (V0.Position.X - V2.Position.X) / (V0.Position.Y - V2.Position.Y);
@@ -177,14 +229,14 @@ namespace core
         float CurrentX0 = V2.Position.X;
         float CurrentY = V2.Position.Y;
 
-        int32 V2Y = static_cast<int32>(round(V2.Position.Y));
-        int32 V1V0Y = static_cast<int32>(round(V1.Position.Y));
+        int32 V2Y = static_cast<int32>(roundf(V2.Position.Y));
+        int32 V1V0Y = static_cast<int32>(roundf(V1.Position.Y));
 
         int32 ScanLineY = V2Y;
         do
         {
-            int32 StartX = static_cast<int32>(round(CurrentX1));
-            int32 EndX = static_cast<int32>(round(CurrentX0));
+            int32 StartX = static_cast<int32>(roundf(CurrentX1));
+            int32 EndX = static_cast<int32>(roundf(CurrentX0));
 
             for (int32 i = StartX; i <= EndX; ++i)
             {
@@ -219,12 +271,26 @@ namespace core
                         V2.Color * (Point2Weight / V2.CameraSpaceZ)
                         ) / (1 / Zt);
 
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = (
+                        V0.UV * (Point0Weight / V0.CameraSpaceZ) +
+                        V1.UV * (Point1Weight / V1.CameraSpaceZ) +
+                        V2.UV * (Point2Weight / V2.CameraSpaceZ)
+                        ) / (1 / Zt);
+
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
                 else
                 {
                     FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = V0.UV * Point0Weight + V1.UV * Point1Weight + V2.UV * Point2Weight;
+
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
             }
 
@@ -247,13 +313,13 @@ namespace core
     //     |         \ |
     //     |           V2
     //  V0, V1 and V2 have been clipped, they layed in [0, 1].
-    void URasterizer::FillUpALineL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpALineL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
-        int32 StartX = static_cast<int32>(round(V1.Position.X));
-        int32 EndX = static_cast<int32>(round(V3.Position.X));
+        int32 StartX = static_cast<int32>(roundf(V1.Position.X));
+        int32 EndX = static_cast<int32>(roundf(V3.Position.X));
 
         float CurrentY = V1.Position.Y;
-        int32 ScanLineY = static_cast<int32>(round(V1.Position.Y));
+        int32 ScanLineY = static_cast<int32>(roundf(V1.Position.Y));
 
         for (int32 i = StartX; i <= EndX; ++i)
         {
@@ -288,12 +354,26 @@ namespace core
                     V2.Color * (Point2Weight / V2.CameraSpaceZ)
                     ) / (1 / Zt);
 
-                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                FVector2 InterpolatedUV = (
+                    V0.UV * (Point0Weight / V0.CameraSpaceZ) +
+                    V1.UV * (Point1Weight / V1.CameraSpaceZ) +
+                    V2.UV * (Point2Weight / V2.CameraSpaceZ)
+                    ) / (1 / Zt);
+
+                FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
             }
             else
             {
                 FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
-                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                FVector2 InterpolatedUV = V0.UV * Point0Weight + V1.UV * Point1Weight + V2.UV * Point2Weight;
+
+                FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
             }
         }
     }
@@ -309,13 +389,13 @@ namespace core
     //     |           | /
     //     |           V2
     //  V0, V1 and V2 have been clipped, they layed in [0, 1].
-    void URasterizer::FillUpALineR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpALineR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, const FVertex& V3, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
-        int32 StartX = static_cast<int32>(round(V3.Position.X));
-        int32 EndX = static_cast<int32>(round(V1.Position.X));
+        int32 StartX = static_cast<int32>(roundf(V3.Position.X));
+        int32 EndX = static_cast<int32>(roundf(V1.Position.X));
 
         float CurrentY = V3.Position.Y;
-        int32 ScanLineY = static_cast<int32>(round(V3.Position.Y));
+        int32 ScanLineY = static_cast<int32>(roundf(V3.Position.Y));
 
         for (int32 i = StartX; i <= EndX; ++i)
         {
@@ -350,12 +430,26 @@ namespace core
                     V2.Color * (Point2Weight / V2.CameraSpaceZ)
                     ) / (1 / Zt);
 
-                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                FVector2 InterpolatedUV = (
+                    V0.UV * (Point0Weight / V0.CameraSpaceZ) +
+                    V1.UV * (Point1Weight / V1.CameraSpaceZ) +
+                    V2.UV * (Point2Weight / V2.CameraSpaceZ)
+                    ) / (1 / Zt);
+
+                FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
             }
             else
             {
                 FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
-                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                FVector2 InterpolatedUV = V0.UV * Point0Weight + V1.UV * Point1Weight + V2.UV * Point2Weight;
+
+                FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
             }
         }
     }
@@ -366,7 +460,7 @@ namespace core
     //     |        /    \
     //     |       /      \
     //     |      V1-------V2
-    void URasterizer::FillUpTopFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpTopFlatTriangleL2R(const FVertex& V0, const FVertex& V1, const FVertex& V2, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
         float InvSlope1 = (V1.Position.X - V0.Position.X) / (V1.Position.Y - V0.Position.Y);
         float InvSlope2 = (V2.Position.X - V0.Position.X) / (V2.Position.Y - V0.Position.Y);
@@ -375,14 +469,14 @@ namespace core
         float CurrentX2 = V0.Position.X;
         float CurrentY = V0.Position.Y;
 
-        int32 V0Y = static_cast<int32>(round(V0.Position.Y));
-        int32 V1V2Y = static_cast<int32>(round(V1.Position.Y));
+        int32 V0Y = static_cast<int32>(roundf(V0.Position.Y));
+        int32 V1V2Y = static_cast<int32>(roundf(V1.Position.Y));
 
         int32 ScanLineY = V0Y;
         do
         {
-            int32 StartX = static_cast<int32>(round(CurrentX1));
-            int32 EndX = static_cast<int32>(round(CurrentX2));
+            int32 StartX = static_cast<int32>(roundf(CurrentX1));
+            int32 EndX = static_cast<int32>(roundf(CurrentX2));
 
             for (int32 i = StartX; i <= EndX; ++i)
             {
@@ -417,12 +511,25 @@ namespace core
                     V2.Color * (Point2Weight / V2.CameraSpaceZ)
                     ) / (1 / Zt);
 
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = (
+                    V0.UV * (Point0Weight / V0.CameraSpaceZ) +
+                    V1.UV * (Point1Weight / V1.CameraSpaceZ) +
+                    V2.UV * (Point2Weight / V2.CameraSpaceZ)
+                    ) / (1 / Zt);
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
                 else
                 {
                     FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = V0.UV * Point0Weight + V1.UV * Point1Weight + V2.UV * Point2Weight;
+
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
             }
 
@@ -440,7 +547,7 @@ namespace core
     //     |        /    \
     //     |       /      \
     //     |      V2-------V1
-    void URasterizer::FillUpTopFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::FillUpTopFlatTriangleR2L(const FVertex& V0, const FVertex& V1, const FVertex& V2, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
         float InvSlope2 = (V2.Position.X - V0.Position.X) / (V2.Position.Y - V0.Position.Y);
         float InvSlope1 = (V1.Position.X - V0.Position.X) / (V1.Position.Y - V0.Position.Y);
@@ -449,14 +556,14 @@ namespace core
         float CurrentX1 = V0.Position.X;
         float CurrentY = V0.Position.Y;
 
-        int32 V0Y = static_cast<int32>(round(V0.Position.Y));
-        int32 V1V2Y = static_cast<int32>(round(V2.Position.Y));
+        int32 V0Y = static_cast<int32>(roundf(V0.Position.Y));
+        int32 V1V2Y = static_cast<int32>(roundf(V2.Position.Y));
 
         int32 ScanLineY = V0Y;
         do
         {
-            int32 StartX = static_cast<int32>(round(CurrentX2));
-            int32 EndX = static_cast<int32>(round(CurrentX1));
+            int32 StartX = static_cast<int32>(roundf(CurrentX2));
+            int32 EndX = static_cast<int32>(roundf(CurrentX1));
 
             for (int32 i = StartX; i <= EndX; ++i)
             {
@@ -491,12 +598,26 @@ namespace core
                     V2.Color * (Point2Weight / V2.CameraSpaceZ)
                     ) / (1 / Zt);
 
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = (
+                    V0.UV * (Point0Weight / V0.CameraSpaceZ) +
+                    V1.UV * (Point1Weight / V1.CameraSpaceZ) +
+                    V2.UV * (Point2Weight / V2.CameraSpaceZ)
+                    ) / (1 / Zt);
+
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
                 else
                 {
                     FHDRColor InterpolatedColor = V0.Color * Point0Weight + V1.Color * Point1Weight + V2.Color * Point2Weight;
-                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
+                    FVector2 InterpolatedUV = V0.UV * Point0Weight + V1.UV * Point1Weight + V2.UV * Point2Weight;
+
+                    FHDRColor Result = ShadingComponent.Shading(InterpolatedUV);
+
+                    IrradianceBuffer.FillUpOnePixel(ScanLineY, i, Result);
+                    //IrradianceBuffer.FillUpOnePixel(ScanLineY, i, InterpolatedColor);
                 }
             }
 
@@ -508,7 +629,7 @@ namespace core
         while (ScanLineY < V1V2Y);
     }
 
-    void URasterizer::DoStandard(const FTriangle& Triangle, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::DoStandard(const FTriangle& Triangle, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
         FTriangle SortedTriangle = SortByY(Triangle);
 
@@ -525,11 +646,11 @@ namespace core
         {
             if (SortedTriangle.V0.Position.X <= SortedTriangle.V1.Position.X)
             {
-                FillUpBottomFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpBottomFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
-                FillUpBottomFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpBottomFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }
         //(0,0)-----------------
@@ -543,11 +664,11 @@ namespace core
         {
             if (SortedTriangle.V1.Position.X <= SortedTriangle.V2.Position.X)
             {
-                FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
-                FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }
         //  Gneral case - split the triangle in a top-flat and bottom-flat one.
@@ -556,10 +677,11 @@ namespace core
             FVertex V3 = FVertex(
                 SortedTriangle.V0.Position.X + (SortedTriangle.V1.Position.Y - SortedTriangle.V0.Position.Y) / (SortedTriangle.V2.Position.Y - SortedTriangle.V0.Position.Y) * (SortedTriangle.V2.Position.X - SortedTriangle.V0.Position.X),
                 SortedTriangle.V1.Position.Y,
-                SortedTriangle.V1.Position.Z,   //  TODO:   Process 2d point, discard z component.
+                0,   //  XXX:    Position.Z is not used during rasterization.
                 1.0f);
             V3.CameraSpaceZ = GetInterpolatedCameraSpaceZ(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3);
             V3.Color = GetInterpolatedColorOfGeneralCaseTriangle(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, bPerspectiveCorrectInterpolation);
+            V3.UV = GetInterpolatedUVOfGeneralCaseTriangle(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, bPerspectiveCorrectInterpolation);
 
             //(0,0)-----------------
             //     |          V0
@@ -569,22 +691,22 @@ namespace core
             //     |      V1-------V3
             if (SortedTriangle.V1.Position.X <= V3.Position.X)
             {
-                FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1,V3, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, V3, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
-                FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, V3, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, V3, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
 
             //  Patch a line between two triangles.
             {
                 if (SortedTriangle.V1.Position.X <= V3.Position.X)
                 {
-                    FillUpALineL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                    FillUpALineL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
                 }
                 else
                 {
-                    FillUpALineR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                    FillUpALineR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
                 }
             }
             //(0,0)-----------------
@@ -595,17 +717,17 @@ namespace core
             //     |          V2
             if (SortedTriangle.V1.Position.X <= V3.Position.X)
             {
-                FillUpBottomFlatTriangleL2R(SortedTriangle.V1, V3, SortedTriangle.V2, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpBottomFlatTriangleL2R(SortedTriangle.V1, V3, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
-                FillUpBottomFlatTriangleR2L(SortedTriangle.V1, V3, SortedTriangle.V2, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                FillUpBottomFlatTriangleR2L(SortedTriangle.V1, V3, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }
     }
 
-    void URasterizer::RasterizeTriangle(const FTriangle& Triangle, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void URasterizer::RasterizeTriangle(const FTriangle& Triangle, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
-        DoStandard(Triangle, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+        DoStandard(Triangle, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
     }
 }

@@ -1,9 +1,11 @@
 ﻿#include "Game.h"
 #include "../Math/MathGlobal.h"
 #include "../Components/StaticMeshComponent.h"
+#include "../Components/ShadingComponent.h"
 #include "../Rasterizer/Vertex.h"
 #include "Camera.h"
 #include "../Rasterizer/Driver.h"
+#include "../Others/AssetManager.h"
 
 namespace core
 {
@@ -33,12 +35,15 @@ namespace core
         StaticMeshComponent->AddIndex(1);
         StaticMeshComponent->AddIndex(2);
 
-        //StaticMeshComponent->AddIndex(3);
-        //StaticMeshComponent->AddIndex(4);
-        //StaticMeshComponent->AddIndex(5);
+        std::unique_ptr<FTexture> AlbedoTexture = std::make_unique<FTexture>();
+        UAssetManager::Instance()->LoadTexture("checkerboard.png", AlbedoTexture.get());
+
+        std::unique_ptr<UShadingComponent> ShadingComponent = std::make_unique<UShadingComponent>();
+        ShadingComponent->SetAlbedo(std::move(AlbedoTexture));
 
         std::unique_ptr<UActor> TriangleActor = std::make_unique<UActor>();
         TriangleActor->RegisterStaticMeshComponent(std::move(StaticMeshComponent));
+        TriangleActor->RegisterShadingComponent(std::move(ShadingComponent));
         CurrentWorld->AddBasicActor(std::move(TriangleActor));
 
         std::unique_ptr<UCamera> CameraActor = std::make_unique<UCamera>();

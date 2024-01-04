@@ -50,22 +50,6 @@ namespace core
         return true;
     }
 
-    void FIrradianceBuffer::FillUpHorizontal(int32 Y, int32 StartX, int32 EndX, const FHDRColor& Color)
-    {
-        if (Y < 0 || Y >= Height)
-        {
-            return;
-        }
-
-        StartX = std::max(0, StartX);
-        EndX = std::min(EndX, Width - 1);
-
-        for (int32 i = StartX; i <= EndX; ++i)
-        {
-            HDRData[Y][i] = Color;
-        }
-    }
-
     void FIrradianceBuffer::FillUpOnePixel(int32 Y, int32 X, const FHDRColor& Color)
     {
         if (Y < 0 || Y >= Height)
@@ -87,6 +71,9 @@ namespace core
                 LDRData[i][j].B = static_cast<uint8>(HDRData[i][j].B * 255.0f);
                 LDRData[i][j].A = static_cast<uint8>(HDRData[i][j].A * 255.0f);
 
+                //  XXX:    UI rendering using OpenGL RHI, its texture coordinates start at (0,0) for the lower left corner of a texture image to (1,1) for the upper right corner of a texture image.
+                //          Our irradiance buffer coordinates start at (0,0) for the upper left corner to (1,1) for the lower right.
+                //          So we should flip our irradiance buffer for rendering UI.
                 FlippedLDRRawData[((Height - i - 1) * Width + j) * sizeof(FLDRColor) + 0] = LDRData[i][j].R;
                 FlippedLDRRawData[((Height - i - 1) * Width + j) * sizeof(FLDRColor) + 1] = LDRData[i][j].G;
                 FlippedLDRRawData[((Height - i - 1) * Width + j) * sizeof(FLDRColor) + 2] = LDRData[i][j].B;

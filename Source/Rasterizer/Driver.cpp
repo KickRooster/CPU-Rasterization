@@ -55,14 +55,14 @@ namespace core
         }
     }
 
-    void UDriver::Rasterize(FPrimitiveList& PrimitiveList, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
+    void UDriver::Rasterize(FPrimitiveList& PrimitiveList, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const
     {
         PrimitiveList.BeforeRasterizing();
         {
             while (PrimitiveList.TopIsValid())
             {
                 FTriangle Triangle = PrimitiveList.PopTriangle();
-                URasterizer::Instance()->RasterizeTriangle(Triangle, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+                URasterizer::Instance()->RasterizeTriangle(Triangle, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }
         PrimitiveList.PostRasterizing();
@@ -80,7 +80,7 @@ namespace core
 
     void UDriver::DrawActor(UActor& Actor, const UCamera& Camera, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer)
     {
-        if (Actor.GetStaticMeshComponent())
+        if (Actor.GetStaticMeshComponent() && Actor.GetShadingComponent())
         {
             FPrimitiveList TransformedPrimitiveList = Actor.GetStaticMeshComponent()->GetPrimitiveList();
             //  Transform local to world.
@@ -96,7 +96,7 @@ namespace core
             Project2NDC(TransformedPrimitiveList);
             //  Transform NDC to viewport.
             Transform(TransformedPrimitiveList, ViewportMat);
-            Rasterize(TransformedPrimitiveList, bPerspectiveCorrectInterpolation, IrradianceBuffer);
+            Rasterize(TransformedPrimitiveList, *Actor.GetShadingComponent(), bPerspectiveCorrectInterpolation, IrradianceBuffer);
         }
     }
 }

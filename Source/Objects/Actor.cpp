@@ -18,11 +18,26 @@ namespace core
         this->StaticMeshComponent = std::move(StaticMeshComponent);
     }
 
+    void UActor::RegisterShadingComponent(std::unique_ptr<UShadingComponent> ShadingComponent)
+    {
+        this->ShadingComponent = std::move(ShadingComponent);
+    }
+
     UStaticMeshComponent* UActor::GetStaticMeshComponent() const
     {
         if (StaticMeshComponent)
         {
             return StaticMeshComponent.get();
+        }
+
+        return nullptr;
+    }
+
+    UShadingComponent* UActor::GetShadingComponent() const
+    {
+        if (ShadingComponent)
+        {
+            return ShadingComponent.get();
         }
 
         return nullptr;

@@ -347,10 +347,15 @@ int main(int, char**)
 
         UpdateTexture(ImageTextureID, ViewportWidth, ViewportHeight, GameInstance->GetLDRData());
 
-        // 0.
+        //  Editor UI begin
+
+        //  Viewport panel
         ImGui::Begin("Rasterizing View");
         ImGui::Image((void*)(intptr_t)ImageTextureID, ImVec2(static_cast<float>(ViewportWidth), static_cast<float>(ViewportHeight)));
         ImGui::End();
+
+        //  Asset panel
+        //  XXX:    todo.
 
         // Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
@@ -392,7 +397,7 @@ int main(int, char**)
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    	
+
         // Update and Render additional Platform Windows
         // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
         //  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)

@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <Core.h>
+
+#include "../Components/ShadingComponent.h"
 #include "../Components/StaticMeshComponent.h"
 #include "../Math/Vector3.h"
 #include "../Math/Matrix4x4.h"
@@ -10,6 +12,7 @@ namespace core
     {
     protected:
         std::unique_ptr<UStaticMeshComponent> StaticMeshComponent;
+        std::unique_ptr<UShadingComponent> ShadingComponent;
         FMatrix4x4 Local2WorldMatrix;
         FMatrix4x4 World2LocalMatrix;
 
@@ -20,7 +23,9 @@ namespace core
 
         UActor();
         void RegisterStaticMeshComponent(std::unique_ptr<UStaticMeshComponent> StaticMeshComponent);
+        void RegisterShadingComponent(std::unique_ptr<UShadingComponent> ShadingComponent);
         UStaticMeshComponent* GetStaticMeshComponent() const;
+        UShadingComponent* GetShadingComponent() const;
         const FMatrix4x4& GetLocal2WorldMatrix() const;
         const FMatrix4x4& GetWorld2LocalMatrix() const ;
         virtual void Tick(float DeltaTime);

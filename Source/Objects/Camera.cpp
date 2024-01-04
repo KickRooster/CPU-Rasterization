@@ -93,8 +93,8 @@ namespace core
     //  D3D style, left-handed coordinate projection matrix.
     void UCamera::BuildPerspectiveProjectionMatrix()
     {
-        PerspectiveProjectionMatrix.M[0][0] = 1.0f / (Aspect * tan(FieldOfViewY * 0.5f));
-        PerspectiveProjectionMatrix.M[1][1] = 1.0f / tan(FieldOfViewY * 0.5f);
+        PerspectiveProjectionMatrix.M[0][0] = 1.0f / (Aspect * tanf(FieldOfViewY * 0.5f));
+        PerspectiveProjectionMatrix.M[1][1] = 1.0f / tanf(FieldOfViewY * 0.5f);
         PerspectiveProjectionMatrix.M[2][2] = ZFar / (ZFar - ZNear);
         PerspectiveProjectionMatrix.M[2][3] = 1.0f;
         PerspectiveProjectionMatrix.M[3][2] = -ZNear * ZFar / (ZFar - ZNear);

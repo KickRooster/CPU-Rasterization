@@ -19,7 +19,7 @@ namespace core
 
     float GetLength(const FVector2& Vector)
     {
-        return sqrt(Vector.X * Vector.X + Vector.Y * Vector.Y);
+        return sqrtf(Vector.X * Vector.X + Vector.Y * Vector.Y);
     }
 
     float Cross(const FVector2& LHS, const FVector2& RHS)

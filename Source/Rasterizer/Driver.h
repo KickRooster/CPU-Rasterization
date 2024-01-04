@@ -5,6 +5,7 @@
 #include "../Math/Rect.h"
 #include "Rasterizer.h"
 #include "IrradianceBuffer.h"
+#include "../Components/ShadingComponent.h"
 
 namespace core
 {
@@ -37,7 +38,7 @@ namespace core
         void Transform(FPrimitiveList& PrimitiveList, const FMatrix4x4& Matrix) const;
         void RecordCameraSpaceZ(FPrimitiveList& PrimitiveList) const;
         void Project2NDC(FPrimitiveList& PrimitiveList) const;
-        void Rasterize(FPrimitiveList& PrimitiveList, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const;
+        void Rasterize(FPrimitiveList& PrimitiveList, const UShadingComponent& ShadingComponent, bool bPerspectiveCorrectInterpolation, FIrradianceBuffer& IrradianceBuffer) const;
 
     public:
         void SetViewport(int32 X, int32 Y, int32 Width, int32 Height);

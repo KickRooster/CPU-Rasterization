@@ -129,8 +129,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Assets\IAsset.cpp" />
+    <ClCompile Include="Source\Assets\Texture.cpp" />
     <ClCompile Include="Source\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="Source\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Source\Components\ShadingComponent.cpp" />
     <ClCompile Include="Source\Components\SkeletalMeshComponent.cpp" />
     <ClCompile Include="Source\Components\StaticMeshComponent.cpp" />
     <ClCompile Include="Source\Components\TransformComponent.cpp" />
@@ -152,20 +155,25 @@
     <ClCompile Include="Source\Objects\Game.cpp" />
     <ClCompile Include="Source\Objects\World.cpp" />
     <ClCompile Include="Source\Others\Joystick.cpp" />
+    <ClCompile Include="Source\Others\AssetManager.cpp" />
     <ClCompile Include="Source\Rasterizer\HDRColor.cpp" />
     <ClCompile Include="Source\Rasterizer\Driver.cpp" />
     <ClCompile Include="Source\Rasterizer\IrradianceBuffer.cpp" />
     <ClCompile Include="Source\Rasterizer\Point2.cpp" />
     <ClCompile Include="Source\Rasterizer\Rasterizer.cpp" />
     <ClCompile Include="Source\Rasterizer\LDRColor.cpp" />
+    <ClCompile Include="Source\Rasterizer\Sampler.cpp" />
     <ClCompile Include="Source\Rasterizer\Triangle.cpp" />
     <ClCompile Include="Source\Rasterizer\Vertex.cpp" />
     <ClCompile Include="Source\Rasterizer\PrimitiveList.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Assets\IAsset.h" />
+    <ClInclude Include="Source\Assets\Texture.h" />
     <ClInclude Include="Source\backends\imgui_impl_glfw.h" />
     <ClInclude Include="Source\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="Source\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Source\Components\ShadingComponent.h" />
     <ClInclude Include="Source\Components\SkeletalMeshComponent.h" />
     <ClInclude Include="Source\Components\StaticMeshComponent.h" />
     <ClInclude Include="Source\Components\TransformComponent.h" />
@@ -188,12 +196,14 @@
     <ClInclude Include="Source\Objects\Game.h" />
     <ClInclude Include="Source\Objects\World.h" />
     <ClInclude Include="Source\Others\Joystick.h" />
+    <ClInclude Include="Source\Others\AssetManager.h" />
     <ClInclude Include="Source\Rasterizer\HDRColor.h" />
     <ClInclude Include="Source\Rasterizer\Driver.h" />
     <ClInclude Include="Source\Rasterizer\IrradianceBuffer.h" />
     <ClInclude Include="Source\Rasterizer\Point2.h" />
     <ClInclude Include="Source\Rasterizer\Rasterizer.h" />
     <ClInclude Include="Source\Rasterizer\LDRColor.h" />
+    <ClInclude Include="Source\Rasterizer\Sampler.h" />
     <ClInclude Include="Source\Rasterizer\Triangle.h" />
     <ClInclude Include="Source\Rasterizer\Vertex.h" />
     <ClInclude Include="Source\Rasterizer\PrimitiveList.h" />
