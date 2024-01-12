@@ -57,8 +57,8 @@ namespace core
             }
         }
 
-        ProcessedUV.X *= static_cast<float>(Texture.Width);
-        ProcessedUV.Y *= static_cast<float>(Texture.Height);
+        ProcessedUV.X *= static_cast<float>(Texture.Width - 1);
+        ProcessedUV.Y *= static_cast<float>(Texture.Height - 1);
 
         //  Set alpha to 255 as default.
         FLDRColor Result = FLDRColor(0, 0, 0, 255);

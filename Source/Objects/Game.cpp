@@ -13,30 +13,28 @@ namespace core
     {
         CurrentWorld = std::make_unique<UWorld>();
 
-        FVertex Vertex0(FVector4(-20.0, -20, 0, 1.0), FHDRColor::Red, FVector2(0, 0));
-        FVertex Vertex1(FVector4(0, 20.0, 0, 1.0), FHDRColor::Green, FVector2(0.5, 1.0));
-        FVertex Vertex2(FVector4(20.0, -20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
-
-        //FVertex Vertex0(FVector4(-20.0, 20, 0, 1.0), FHDRColor::Red, FVector2(0, 0));
-        //FVertex Vertex1(FVector4(20, 20.0, 0, 1.0), FHDRColor::Green, FVector2(0.5, 1.0));
-        //FVertex Vertex2(FVector4(0, -20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
-
-        //FVertex Vertex0(FVector4(-20.0, 20, 0, 1.0), FHDRColor::Red, FVector2(0, 0));
-        //FVertex Vertex1(FVector4(20, 40.0, 0, 1.0), FHDRColor::Green, FVector2(0.5, 1.0));
-        //FVertex Vertex2(FVector4(20, -20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
+        FVertex Vertex0(FVector4(-20.0, -20, 0, 1.0), FHDRColor::Red, FVector2(0, 1.0f));
+        FVertex Vertex1(FVector4(-20.0, 20.0, 0, 1.0), FHDRColor::Green, FVector2(0, 0));
+        FVertex Vertex2(FVector4(20.0, 20.0, 0, 1.0), FHDRColor::Blue, FVector2(1.0, 0));
+        FVertex Vertex3(FVector4(20.0, -20.0, 0, 1.0), FHDRColor::Yellow, FVector2(1.0, 1.0));
 
         std::unique_ptr<UStaticMeshComponent> StaticMeshComponent = std::make_unique<UStaticMeshComponent>();
         StaticMeshComponent->AddVertex(Vertex0);
         StaticMeshComponent->AddVertex(Vertex1);
         StaticMeshComponent->AddVertex(Vertex2);
+        StaticMeshComponent->AddVertex(Vertex3);
 
         //  Clockwise.
         StaticMeshComponent->AddIndex(0);
         StaticMeshComponent->AddIndex(1);
         StaticMeshComponent->AddIndex(2);
 
+        StaticMeshComponent->AddIndex(0);
+        StaticMeshComponent->AddIndex(2);
+        StaticMeshComponent->AddIndex(3);
+
         std::unique_ptr<FTexture> AlbedoTexture = std::make_unique<FTexture>();
-        UAssetManager::Instance()->LoadTexture("checkerboard.png", AlbedoTexture.get());
+        UAssetManager::Instance()->LoadTexture("book_pbrt.png", AlbedoTexture.get());
 
         std::unique_ptr<UShadingComponent> ShadingComponent = std::make_unique<UShadingComponent>();
         ShadingComponent->SetAlbedo(std::move(AlbedoTexture));

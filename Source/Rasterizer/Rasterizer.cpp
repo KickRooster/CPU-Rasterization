@@ -163,14 +163,14 @@ namespace core
 
                 float Area012 = GetArea(Point0, Point1, Point2);
 
-                float Area1P2 = GetArea(PointP, Point1, Point2);
-                float Point0Weight = Area1P2 / Area012;
+                float AreaP12 = GetArea(PointP, Point1, Point2);
+                float Point0Weight = AreaP12 / Area012;
 
-                float Area2P0 = GetArea(PointP, Point2, Point0);
-                float Point1Weight = Area2P0 / Area012;
+                float AreaP02 = GetArea(PointP, Point0, Point2);
+                float Point1Weight = AreaP02 / Area012;
 
-                float Area0P1 = GetArea(PointP, Point0, Point1);
-                float Point2Weight = Area0P1 / Area012;
+                float AreaP01 = GetArea(PointP, Point0, Point1);
+                float Point2Weight = AreaP01 / Area012;
 
                 if (bPerspectiveCorrectInterpolation)
                 {
@@ -252,14 +252,14 @@ namespace core
 
                 float Area102 = GetArea(Point1, Point0, Point2);
 
-                float Area2P0 = GetArea(PointP, Point2, Point0);
-                float Point1Weight = Area2P0 / Area102;
+                float AreaP02 = GetArea(PointP, Point0, Point2);
+                float Point1Weight = AreaP02 / Area102;
 
-                float Area1P2 = GetArea(PointP, Point1, Point2);
-                float Point0Weight = Area1P2 / Area102;
+                float AreaP12 = GetArea(PointP, Point1, Point2);
+                float Point0Weight = AreaP12 / Area102;
 
-                float Area0P1 = GetArea(PointP, Point0, Point1);
-                float Point2Weight = Area0P1 / Area102;
+                float AreaP10 = GetArea(PointP, Point1, Point0);
+                float Point2Weight = AreaP10 / Area102;
 
                 if (bPerspectiveCorrectInterpolation)
                 {
@@ -635,39 +635,51 @@ namespace core
 
         //  Till now, the original of the coordinate of Triangle is top-left, after viewport transformation.
 
-        //(0,0)-----------------
-        //     |      V0-------V1
-        //     |       \      /
-        //     |        \    /
-        //     |         \  /
-        //     |          V2
         //  Check for trivial case of bottom-flat triangle.
         if (Equal(SortedTriangle.V0.Position.Y, SortedTriangle.V1.Position.Y))
         {
             if (SortedTriangle.V0.Position.X <= SortedTriangle.V1.Position.X)
             {
+                //(0,0)-----------------
+                //     |      V0-------V1
+                //     |       \      /
+                //     |        \    /
+                //     |         \  /
+                //     |          V2
                 FillUpBottomFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
+                //(0,0)-----------------
+                //     |      V1-------V0
+                //     |       \      /
+                //     |        \    /
+                //     |         \  /
+                //     |          V2
                 FillUpBottomFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }
-        //(0,0)-----------------
-        //     |          V0
-        //     |         /  \
-        //     |        /    \
-        //     |       /      \
-        //     |      V1-------V2
         //  Check for trivial case of top-flat triangle.
         else if (Equal(SortedTriangle.V1.Position.Y, SortedTriangle.V2.Position.Y))
         {
             if (SortedTriangle.V1.Position.X <= SortedTriangle.V2.Position.X)
             {
+                //(0,0)-----------------
+                //     |          V0
+                //     |         /  \
+                //     |        /    \
+                //     |       /      \
+                //     |      V1-------V2
                 FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
+                //(0,0)-----------------
+                //     |          V0
+                //     |         /  \
+                //     |        /    \
+                //     |       /      \
+                //     |      V2-------V1
                 FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }
@@ -677,24 +689,30 @@ namespace core
             FVertex V3 = FVertex(
                 SortedTriangle.V0.Position.X + (SortedTriangle.V1.Position.Y - SortedTriangle.V0.Position.Y) / (SortedTriangle.V2.Position.Y - SortedTriangle.V0.Position.Y) * (SortedTriangle.V2.Position.X - SortedTriangle.V0.Position.X),
                 SortedTriangle.V1.Position.Y,
-                0,   //  XXX:    Position.Z is not used during rasterization.
+                0,   //  XXX:    Position.Z is not used during rasterizating.
                 1.0f);
             V3.CameraSpaceZ = GetInterpolatedCameraSpaceZ(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3);
             V3.Color = GetInterpolatedColorOfGeneralCaseTriangle(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, bPerspectiveCorrectInterpolation);
             V3.UV = GetInterpolatedUVOfGeneralCaseTriangle(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, bPerspectiveCorrectInterpolation);
 
-            //(0,0)-----------------
-            //     |          V0
-            //     |         /  \
-            //     |        /    \
-            //     |       /      \
-            //     |      V1-------V3
             if (SortedTriangle.V1.Position.X <= V3.Position.X)
             {
+                //(0,0)-----------------
+                //     |          V0
+                //     |         /  \
+                //     |        /    \
+                //     |       /      \
+                //     |      V1-------V3
                 FillUpTopFlatTriangleL2R(SortedTriangle.V0, SortedTriangle.V1, V3, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
+                //(0,0)-----------------
+                //     |          V0
+                //     |         /  \
+                //     |        /    \
+                //     |       /      \
+                //     |      V3-------V1
                 FillUpTopFlatTriangleR2L(SortedTriangle.V0, SortedTriangle.V1, V3, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
 
@@ -709,18 +727,24 @@ namespace core
                     FillUpALineR2L(SortedTriangle.V0, SortedTriangle.V1, SortedTriangle.V2, V3, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
                 }
             }
-            //(0,0)-----------------
-            //     |      V1-------V3
-            //     |       \      /
-            //     |        \    /
-            //     |         \  /
-            //     |          V2
             if (SortedTriangle.V1.Position.X <= V3.Position.X)
             {
+                //(0,0)-----------------
+                //     |      V1-------V3
+                //     |       \      /
+                //     |        \    /
+                //     |         \  /
+                //     |          V2
                 FillUpBottomFlatTriangleL2R(SortedTriangle.V1, V3, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
             else
             {
+                //(0,0)-----------------
+                //     |      V3-------V1
+                //     |       \      /
+                //     |        \    /
+                //     |         \  /
+                //     |          V2
                 FillUpBottomFlatTriangleR2L(SortedTriangle.V1, V3, SortedTriangle.V2, ShadingComponent, bPerspectiveCorrectInterpolation, IrradianceBuffer);
             }
         }

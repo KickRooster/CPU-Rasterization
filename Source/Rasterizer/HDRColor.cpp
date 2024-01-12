@@ -54,4 +54,5 @@ namespace core
     FHDRColor FHDRColor::Red = FHDRColor(1.0, 0, 0, 1.0);
     FHDRColor FHDRColor::Green = FHDRColor(0, 1.0, 0, 1.0);
     FHDRColor FHDRColor::Blue = FHDRColor(0, 0, 1.0, 1.0);
+    FHDRColor FHDRColor::Yellow = FHDRColor(1.0, 1.0, 1.0, 1.0);
 }

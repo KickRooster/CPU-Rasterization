@@ -31,6 +31,9 @@ namespace core
     {
         Position = Vertex.Position;
         Color = Vertex.Color;
+        UV = Vertex.UV;
+        CameraSpaceZ = Vertex.CameraSpaceZ;
+        //  XXX:    Every property must be copied here!!!
 
         return *this;
     }

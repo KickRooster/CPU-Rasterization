@@ -20,5 +20,6 @@ namespace core
         static FHDRColor Red;
         static FHDRColor Green;
         static FHDRColor Blue;
+        static FHDRColor Yellow;
     };
 }
