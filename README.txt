@@ -1,2 +1,2 @@
 A path tracer based on software raster renderer.
-![](screenshot0.png)
+![](https://github.com/KickRooster/PathTracer/blob/master/screenshot0.png)
