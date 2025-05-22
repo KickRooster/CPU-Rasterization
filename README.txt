@@ -1,1 +1,1 @@
-![截图](screenshot0.png)
+![](screenshot0.png)
