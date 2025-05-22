@@ -1,1 +1,1 @@
-![A CPU Rasterization Renderer](https://github.com/KickRooster/CPU-Rasterization/blob/master/screenshot0.png)
+![截图](screenshot0.png)
